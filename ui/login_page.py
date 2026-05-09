@@ -3,6 +3,7 @@ from PIL import Image
 import tkinter as tk
 from tkinter import messagebox
 from utils.auth import login_user
+from ui.dashboards.admin_dashboard import AdminDashboard
 
 
 class LoginPage(ctk.CTkFrame):
@@ -123,7 +124,10 @@ class LoginPage(ctk.CTkFrame):
                 f"Welcome {username}!\nRole: {role}"
             )
 
-            print("Logged in")
+            self.destroy()
+
+            dashboard = AdminDashboard(self.master)
+            dashboard.pack(fill="both", expand=True)
 
         else:
 
