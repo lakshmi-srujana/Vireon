@@ -6,7 +6,7 @@ from PIL import Image
 ctk.set_appearance_mode("light")
 
 app = ctk.CTk()
-app.geometry("1200x700")
+app.geometry("1200x700+160+70")
 app.title("Vireon")
 app.resizable(False, False)
 
@@ -34,7 +34,7 @@ role_menu = ctk.CTkOptionMenu(
     dropdown_hover_color="#D1DDF8",
     dropdown_text_color="#19325F",
     text_color="#19325F",
-    font=("Georgia", 12),
+    font=("Georgia", 13),
     corner_radius=15,
     anchor="w"
 )
@@ -51,7 +51,7 @@ username_entry = ctk.CTkEntry(
     fg_color="#A3BEDD",
     border_width=0,
     text_color="#19325F",
-    font=("Georgia", 12)
+    font=("Georgia", 13)
 )
 
 username_entry.place(x=680, y=390)
@@ -67,7 +67,7 @@ password_entry = ctk.CTkEntry(
     border_width=0,
     text_color="#19325F",
     show="•",
-    font=("Georgia", 12)
+    font=("Georgia", 13)
 )
 
 password_entry.place(x=680, y=470)
@@ -90,4 +90,5 @@ login_button.place(x=760, y=530)
 
 # ---------------- RUN APP ---------------- #
 
-app.mainloop()
+if __name__ == "__main__":
+    app.mainloop()
