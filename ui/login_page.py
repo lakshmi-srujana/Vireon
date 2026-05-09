@@ -1,6 +1,8 @@
 import customtkinter as ctk
 from PIL import Image
 import tkinter as tk
+from tkinter import messagebox
+from utils.auth import login_user
 # ---------------- APP ---------------- #
 
 ctk.set_appearance_mode("light")
@@ -87,6 +89,32 @@ forgot_password.place(x=1190, y=635)
 
 # ---------------- LOGIN BUTTON ---------------- #
 
+def handle_login():
+
+    username = username_entry.get()
+    password = password_entry.get()
+
+    user = login_user(username, password)
+
+    if user:
+
+        role = user['role']
+
+        messagebox.showinfo(
+            "Login Success",
+            f"Welcome {username}!\nRole: {role}"
+        )
+
+        print("Logged in")
+
+    else:
+
+        messagebox.showerror(
+            "Login Failed",
+            "Invalid username or password"
+        )
+
+
 login_button = ctk.CTkButton(
     app,
     text="Login",
@@ -96,10 +124,12 @@ login_button = ctk.CTkButton(
     fg_color="#8792AE",
     text_color="#F5F8F9",
     border_width=0,
-    font=("Georgia", 30)
+    font=("Georgia", 30),
+    command=handle_login,
 )
 
 login_button.place(x=760, y=545)
+
 
 # ---------------- RUN APP ---------------- #
 
