@@ -1,6 +1,6 @@
 import customtkinter as ctk
 from PIL import Image
-
+import tkinter as tk
 # ---------------- APP ---------------- #
 
 ctk.set_appearance_mode("light")
@@ -34,7 +34,7 @@ role_menu = ctk.CTkOptionMenu(
     dropdown_hover_color="#D1DDF8",
     dropdown_text_color="#19325F",
     text_color="#19325F",
-    font=("Georgia", 13),
+    font=("Georgia", 14),
     corner_radius=15,
     anchor="w"
 )
@@ -51,7 +51,7 @@ username_entry = ctk.CTkEntry(
     fg_color="#A3BEDD",
     border_width=0,
     text_color="#19325F",
-    font=("Georgia", 13)
+    font=("Georgia", 14)
 )
 
 username_entry.place(x=680, y=390)
@@ -67,10 +67,23 @@ password_entry = ctk.CTkEntry(
     border_width=0,
     text_color="#19325F",
     show="•",
-    font=("Georgia", 13)
+    font=("Georgia", 14)
 )
 
 password_entry.place(x=680, y=470)
+
+# ---------------- FORGOT PASSWORD ---------------- #
+
+forgot_password = tk.Label(
+    app,
+    text="Forgot Password?",
+    fg="#7D88A8",
+    bg="#EAF1FB",
+    cursor="hand2",
+    font=("Georgia", 13)
+)
+
+forgot_password.place(x=1190, y=635)
 
 # ---------------- LOGIN BUTTON ---------------- #
 
@@ -86,7 +99,7 @@ login_button = ctk.CTkButton(
     font=("Georgia", 30)
 )
 
-login_button.place(x=760, y=530)
+login_button.place(x=760, y=545)
 
 # ---------------- RUN APP ---------------- #
 
