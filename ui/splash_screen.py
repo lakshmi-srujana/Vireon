@@ -1,67 +1,58 @@
 import customtkinter as ctk
 from PIL import Image
-import subprocess
-import sys
-
-# ---------------- APP ---------------- #
-
-ctk.set_appearance_mode("light")
-
-splash = ctk.CTk()
-splash.geometry("1200x700+160+70")
-splash.title("Vireon")
-splash.resizable(False, False)
-
-# ---------------- SPLASH IMAGE ---------------- #
-
-splash_image = ctk.CTkImage(
-    light_image=Image.open("assets/images/vireon_splashscreen.png"),
-    size=(1200, 700)
-)
-
-splash_label = ctk.CTkLabel(
-    splash,
-    image=splash_image,
-    text=""
-)
-
-splash_label.place(x=0, y=0)
-
-loading = ctk.CTkProgressBar(
-    splash,
-    width=300,
-    height=8,
-    corner_radius=10,
-    progress_color="#8792AE",
-    fg_color="#DCE6F7"
-)
-
-loading.place(relx=0.5, rely=0.67, anchor="center")
-loading.set(0)
-
-# ---------------- OPEN LOGIN ---------------- #
 
 
-progress_value = 0
+class SplashScreen(ctk.CTkFrame):
 
-def animate_loading():
-    global progress_value
+    def __init__(self, parent, callback):
+        super().__init__(parent)
 
-    progress_value += 0.01
-    loading.set(progress_value)
+        self.callback = callback
 
-    if progress_value < 1:
-        splash.after(20, animate_loading)
-    else:
-        open_login()
+        # ---------------- IMAGE ---------------- #
 
-def open_login():
-    splash.destroy()
-    subprocess.Popen([sys.executable, "ui/login_page.py"])
+        splash_image = ctk.CTkImage(
+            light_image=Image.open("assets/images/vireon_splashscreen.png"),
+            size=(1200, 700)
+        )
 
-animate_loading()
+        splash_label = ctk.CTkLabel(
+            self,
+            image=splash_image,
+            text=""
+        )
 
+        splash_label.place(x=0, y=0)
 
-# ---------------- RUN ---------------- #
+        # Keep image alive
+        self.image = splash_image
 
-splash.mainloop()
+        # ---------------- LOADING ---------------- #
+
+        self.loading = ctk.CTkProgressBar(
+            self,
+            width=300,
+            height=8,
+            corner_radius=10,
+            progress_color="#8792AE",
+            fg_color="#DCE6F7"
+        )
+
+        self.loading.place(relx=0.5, rely=0.67, anchor="center")
+
+        self.progress = 0
+
+        self.animate()
+
+    # ---------------- ANIMATION ---------------- #
+
+    def animate(self):
+
+        self.progress += 0.01
+        self.loading.set(self.progress)
+
+        if self.progress < 1:
+            self.after(20, self.animate)
+
+        else:
+            self.after(300, self.callback)
