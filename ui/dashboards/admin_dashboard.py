@@ -1,6 +1,7 @@
 import customtkinter as ctk
 from PIL import Image
 from ui.dashboards.student_page import StudentsPage
+from ui.dashboards.analytics_page import AnalyticsPage
 
 
 class AdminDashboard(ctk.CTkFrame):
@@ -47,6 +48,8 @@ class AdminDashboard(ctk.CTkFrame):
 
             if text == "Students":
                 button_command = self.open_students
+            elif text == "Analytics":
+                button_command = self.open_analytics
             else:
                 button_command = None
 
@@ -236,6 +239,24 @@ class AdminDashboard(ctk.CTkFrame):
             self.master.deiconify()
 
         student_window.protocol("WM_DELETE_WINDOW", on_close)
+    def open_analytics(self):
+
+        analytics_window = ctk.CTkToplevel(self)
+
+        analytics_window.geometry("1200x700+160+70")
+
+        analytics_window.title("Vireon Analytics")
+
+        analytics_window.resizable(False, False)
+
+        page = AnalyticsPage(analytics_window)
+
+        page.pack(fill="both", expand=True)
+
+        analytics_window.focus_force()
+
+        analytics_window.grab_set()
+
 
 if __name__ == "__main__":
 

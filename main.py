@@ -3,6 +3,7 @@ import customtkinter as ctk
 from ui.splash_screen import SplashScreen
 from ui.login_page import LoginPage
 
+
 ctk.set_appearance_mode("light")
 
 app = ctk.CTk()
