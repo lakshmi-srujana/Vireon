@@ -1,5 +1,6 @@
 import customtkinter as ctk
 from PIL import Image
+from ui.dashboards.student_page import StudentsPage
 
 
 class AdminDashboard(ctk.CTkFrame):
@@ -44,6 +45,11 @@ class AdminDashboard(ctk.CTkFrame):
 
         for text in sidebar_items:
 
+            if text == "Students":
+                button_command = self.open_students
+            else:
+                button_command = None
+
             item = ctk.CTkButton(
                 self,
                 text=text,
@@ -56,7 +62,8 @@ class AdminDashboard(ctk.CTkFrame):
                 border_width=0,
                 font=("Georgia", 14),
                 anchor="center",
-                cursor="hand2"
+                cursor="hand2",
+                command=button_command
             )
 
             item.place(x=135, y=y)
@@ -209,6 +216,26 @@ class AdminDashboard(ctk.CTkFrame):
 
             y += 32
 
+    # ---------------- OPEN STUDENT PAGE ---------------- #
+
+    def open_students(self):
+
+        student_window = ctk.CTkToplevel(self)
+
+        student_window.geometry("1200x700+160+70")
+        student_window.title("Vireon")
+        student_window.resizable(False, False)
+
+        page = StudentsPage(student_window)
+        page.pack(fill="both", expand=True)
+
+        self.master.withdraw()
+
+        def on_close():
+            student_window.destroy()
+            self.master.deiconify()
+
+        student_window.protocol("WM_DELETE_WINDOW", on_close)
 
 if __name__ == "__main__":
 
