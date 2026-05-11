@@ -9,6 +9,10 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from PIL import Image
 
+import pandas as pd
+from tkinter import filedialog
+from tkinter import messagebox
+
 ctk.set_appearance_mode("light")
 
 
@@ -25,7 +29,7 @@ class AnalyticsPage(ctk.CTkFrame):
             fg_color="#DCE6FF",
             corner_radius=20,
             border_width=2,
-            border_color="#B8C4E8"
+            border_color="#A8B8E8"
         )
 
         card.pack(side="left", padx=18)
@@ -50,13 +54,254 @@ class AnalyticsPage(ctk.CTkFrame):
 
         value_label.pack()
 
-    # ---------- CLEAN WINDOW CLOSE ---------- #
+    # ---------- CLOSE WINDOW ---------- #
 
     def close_window(self):
 
-        plt.close(self.fig)
+        plt.close('all')
 
         self.master.destroy()
+
+    # ---------- CLEAR GRAPH ---------- #
+
+    def clear_graph(self):
+
+        for widget in self.analytics_frame.winfo_children():
+
+            if widget not in [
+                self.topper_card,
+                self.export_button
+            ]:
+                widget.destroy()
+
+    # ---------- GRAPH STYLE ---------- #
+
+    def style_graph(self, fig, ax):
+
+        fig.patch.set_facecolor("#DCE6FF")
+
+        ax.set_facecolor("#DCE6FF")
+
+        ax.tick_params(colors="#394B8A")
+
+        for spine in ax.spines.values():
+            spine.set_color("#A8B8E8")
+
+    # ---------- DISPLAY GRAPH ---------- #
+
+    def display_graph(self, fig):
+
+        canvas = FigureCanvasTkAgg(
+            fig,
+            master=self.analytics_frame
+        )
+
+        canvas.draw()
+
+        canvas.get_tk_widget().place(
+            relx=0.60,
+            rely=0.55,
+            anchor="center"
+        )
+
+    # ---------- EXPORT ANALYTICS ---------- #
+
+    def export_analytics(self):
+
+        self.cursor.execute(
+            """
+            SELECT
+            roll_no,
+            full_name,
+            department,
+            cgpa,
+            attendance
+            FROM students
+            """
+        )
+
+        data = self.cursor.fetchall()
+
+        df = pd.DataFrame(
+            data,
+            columns=[
+                "Roll Number",
+                "Full Name",
+                "Department",
+                "CGPA",
+                "Attendance"
+            ]
+        )
+
+        file_path = filedialog.asksaveasfilename(
+            defaultextension=".csv",
+            filetypes=[("CSV files", "*.csv")],
+            title="Save Analytics Report"
+        )
+
+        if file_path:
+
+            df.to_csv(
+                file_path,
+                index=False
+            )
+
+            messagebox.showinfo(
+                "Export Successful",
+                "Analytics exported successfully!"
+            )
+
+    # ---------- CGPA GRAPH ---------- #
+
+    def show_cgpa_graph(self):
+
+        self.clear_graph()
+
+        self.cursor.execute(
+            "SELECT full_name, cgpa FROM students"
+        )
+
+        data = self.cursor.fetchall()
+
+        names = []
+        values = []
+
+        for row in data:
+
+            names.append(row[0])
+
+            values.append(float(row[1]))
+
+        fig, ax = plt.subplots(
+            figsize=(7, 3),
+            dpi=100
+        )
+
+        self.style_graph(fig, ax)
+
+        ax.bar(names, values)
+
+        ax.set_title(
+            "CGPA Distribution",
+            fontsize=16,
+            color="#394B8A"
+        )
+
+        ax.set_xlabel(
+            "Students",
+            fontsize=10,
+            color="#394B8A"
+        )
+
+        ax.set_ylabel(
+            "CGPA",
+            fontsize=10,
+            color="#394B8A"
+        )
+
+        plt.tight_layout()
+
+        self.display_graph(fig)
+
+    # ---------- ATTENDANCE GRAPH ---------- #
+
+    def show_attendance_graph(self):
+
+        self.clear_graph()
+
+        self.cursor.execute(
+            "SELECT full_name, attendance FROM students"
+        )
+
+        data = self.cursor.fetchall()
+
+        names = []
+        values = []
+
+        for row in data:
+
+            names.append(row[0])
+
+            values.append(float(row[1]))
+
+        fig, ax = plt.subplots(
+            figsize=(7, 3),
+            dpi=100
+        )
+
+        self.style_graph(fig, ax)
+
+        ax.bar(names, values)
+
+        ax.set_title(
+            "Attendance Distribution",
+            fontsize=16,
+            color="#394B8A"
+        )
+
+        ax.set_xlabel(
+            "Students",
+            fontsize=10,
+            color="#394B8A"
+        )
+
+        ax.set_ylabel(
+            "Attendance %",
+            fontsize=10,
+            color="#394B8A"
+        )
+
+        plt.tight_layout()
+
+        self.display_graph(fig)
+
+    # ---------- DEPARTMENT GRAPH ---------- #
+
+    def show_department_graph(self):
+
+        self.clear_graph()
+
+        self.cursor.execute(
+            """
+            SELECT department, COUNT(*)
+            FROM students
+            GROUP BY department
+            """
+        )
+
+        data = self.cursor.fetchall()
+
+        departments = []
+        counts = []
+
+        for row in data:
+
+            departments.append(row[0])
+
+            counts.append(row[1])
+
+        fig, ax = plt.subplots(
+            figsize=(6.5, 3),
+            dpi=100
+        )
+
+        fig.patch.set_facecolor("#DCE6FF")
+
+        ax.pie(
+            counts,
+            labels=departments,
+            autopct='%1.1f%%'
+        )
+
+        ax.set_title(
+            "Department Distribution",
+            fontsize=16,
+            color="#394B8A"
+        )
+
+        plt.tight_layout()
+
+        self.display_graph(fig)
 
     # ---------- MAIN ---------- #
 
@@ -69,7 +314,7 @@ class AnalyticsPage(ctk.CTkFrame):
             height=700
         )
 
-        # ---------- DATABASE CONNECTION ---------- #
+        # ---------- DATABASE ---------- #
 
         self.connection = mysql.connector.connect(
             host="localhost",
@@ -80,9 +325,12 @@ class AnalyticsPage(ctk.CTkFrame):
 
         self.cursor = self.connection.cursor()
 
-        # ---------- FETCH ANALYTICS ---------- #
+        # ---------- KPI DATA ---------- #
 
-        self.cursor.execute("SELECT COUNT(*) FROM students")
+        self.cursor.execute(
+            "SELECT COUNT(*) FROM students"
+        )
+
         total_students = self.cursor.fetchone()[0]
 
         self.cursor.execute(
@@ -103,24 +351,7 @@ class AnalyticsPage(ctk.CTkFrame):
 
         low_attendance = self.cursor.fetchone()[0]
 
-        # ---------- GRAPH DATA ---------- #
-
-        self.cursor.execute(
-            "SELECT full_name, cgpa FROM students"
-        )
-
-        graph_data = self.cursor.fetchall()
-
-        student_names = []
-        cgpa_values = []
-
-        for row in graph_data:
-
-            student_names.append(row[0])
-
-            cgpa_values.append(float(row[1]))
-
-        # ---------- BACKGROUND IMAGE ---------- #
+        # ---------- BACKGROUND ---------- #
 
         self.bg_image = ctk.CTkImage(
             light_image=Image.open(
@@ -135,18 +366,19 @@ class AnalyticsPage(ctk.CTkFrame):
             text=""
         )
 
-        bg_label.place(
-            x=0,
-            y=0
-        )
+        bg_label.place(x=0, y=0)
 
         # ---------- TITLE ---------- #
 
         title = ctk.CTkLabel(
             self,
             text="Analytics Dashboard",
-            font=("Georgia", 34, "bold"),
-            text_color="#5B6FB8"
+            font=("Georgia", 36, "bold"),
+            text_color="#5B6FB8",
+            fg_color="#DCE6FF",
+            corner_radius=12,
+            padx=18,
+            pady=6
         )
 
         title.place(
@@ -195,75 +427,162 @@ class AnalyticsPage(ctk.CTkFrame):
             low_attendance
         )
 
+        # ---------- BUTTON FRAME ---------- #
+
+        button_frame = ctk.CTkFrame(
+            self,
+            fg_color="transparent"
+        )
+
+        button_frame.place(
+            relx=0.5,
+            y=280,
+            anchor="center"
+        )
+
+        # ---------- BUTTONS ---------- #
+
+        cgpa_button = ctk.CTkButton(
+            button_frame,
+            text="CGPA",
+            width=160,
+            height=36,
+            corner_radius=12,
+            fg_color="#8792AE",
+            hover_color="#7380A3",
+            command=self.show_cgpa_graph
+        )
+
+        cgpa_button.pack(
+            side="left",
+            padx=12
+        )
+
+        attendance_button = ctk.CTkButton(
+            button_frame,
+            text="Attendance",
+            width=160,
+            height=36,
+            corner_radius=12,
+            fg_color="#8792AE",
+            hover_color="#7380A3",
+            command=self.show_attendance_graph
+        )
+
+        attendance_button.pack(
+            side="left",
+            padx=12
+        )
+
+        department_button = ctk.CTkButton(
+            button_frame,
+            text="Departments",
+            width=160,
+            height=36,
+            corner_radius=12,
+            fg_color="#8792AE",
+            hover_color="#7380A3",
+            command=self.show_department_graph
+        )
+
+        department_button.pack(
+            side="left",
+            padx=12
+        )
+
         # ---------- ANALYTICS FRAME ---------- #
 
-        analytics_frame = ctk.CTkFrame(
+        self.analytics_frame = ctk.CTkFrame(
             self,
-            width=950,
-            height=320,
+            width=1130,
+            height=360,
             fg_color="#E8EEFF",
             corner_radius=30,
             border_width=2,
             border_color="#B8C4E8"
         )
 
-        analytics_frame.place(
+        self.analytics_frame.place(
             relx=0.5,
-            y=300,
+            y=325,
             anchor="n"
         )
 
-        analytics_frame.pack_propagate(False)
+        self.analytics_frame.pack_propagate(False)
 
-        # ---------- GRAPH ---------- #
+        # ---------- TOP PERFORMERS ---------- #
 
-        self.fig, ax = plt.subplots(
-            figsize=(8, 4),
-            dpi=100
+        self.cursor.execute(
+            """
+            SELECT full_name, cgpa
+            FROM students
+            ORDER BY cgpa DESC
+            LIMIT 3
+            """
         )
 
-        self.fig.patch.set_facecolor("#DCE6FF")
+        toppers = self.cursor.fetchall()
 
-        ax.set_facecolor("#DCE6FF")
+        topper_text = "Top Performers\n\n"
 
-        ax.bar(
-            student_names,
-            cgpa_values
+        for student in toppers:
+
+            topper_text += (
+                f"{student[0]}  -  CGPA {student[1]}\n"
+            )
+
+        self.topper_card = ctk.CTkFrame(
+            self.analytics_frame,
+            width=210,
+            height=190,
+            fg_color="#DCE6FF",
+            corner_radius=20,
+            border_width=2,
+            border_color="#A8B8E8"
         )
 
-        ax.set_title(
-            "CGPA Distribution",
-            fontsize=18,
-            color="#394B8A"
+        self.topper_card.place(
+            x=20,
+            y=140
         )
 
-        ax.set_xlabel(
-            "Students",
-            color="#394B8A"
+        self.topper_card.pack_propagate(False)
+
+        topper_label = ctk.CTkLabel(
+            self.topper_card,
+            text=topper_text,
+            font=("Georgia", 16),
+            text_color="#394B8A",
+            justify="left"
         )
 
-        ax.set_ylabel(
-            "CGPA",
-            color="#394B8A"
+        topper_label.pack(
+            pady=15,
+            padx=10
         )
 
-        ax.tick_params(colors="#394B8A")
+        # ---------- EXPORT BUTTON ---------- #
 
-        for spine in ax.spines.values():
-            spine.set_color("#B8C4E8")
-
-        self.canvas = FigureCanvasTkAgg(
-            self.fig,
-            master=analytics_frame
+        self.export_button = ctk.CTkButton(
+            self.analytics_frame,
+            text="Export",
+            text_color="#FFFFFF",
+            width=100,
+            height=30,
+            corner_radius=8,
+            fg_color="#5B6FB8",
+            hover_color="#394B8A",
+            command=self.export_analytics
         )
 
-        self.canvas.draw()
-
-        self.canvas.get_tk_widget().place(
-            relx=0.5,
-            rely=0.5,
-            anchor="center"
+        self.export_button.place(
+            x=1020,
+            y=15
         )
+
+        # ---------- DEFAULT GRAPH ---------- #
+
+        self.show_cgpa_graph()
 
         # ---------- CLEAN CLOSE ---------- #
 
