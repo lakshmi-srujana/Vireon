@@ -173,7 +173,7 @@ class AnalyticsPage(ctk.CTkFrame):
             values.append(float(row[1]))
 
         fig, ax = plt.subplots(
-            figsize=(7, 3),
+            figsize=(10, 3.5),
             dpi=100
         )
 
@@ -225,7 +225,7 @@ class AnalyticsPage(ctk.CTkFrame):
             values.append(float(row[1]))
 
         fig, ax = plt.subplots(
-            figsize=(7, 3),
+            figsize=(10, 3.5),
             dpi=100
         )
 
@@ -281,7 +281,7 @@ class AnalyticsPage(ctk.CTkFrame):
             counts.append(row[1])
 
         fig, ax = plt.subplots(
-            figsize=(6.5, 3),
+            figsize=(10, 3.5),
             dpi=100
         )
 
@@ -382,8 +382,8 @@ class AnalyticsPage(ctk.CTkFrame):
         )
 
         title.place(
-            relx=0.5,
-            y=40,
+            relx=0.55,
+            y=50,
             anchor="center"
         )
 
@@ -397,7 +397,7 @@ class AnalyticsPage(ctk.CTkFrame):
 
         kpi_frame.place(
             relx=0.5,
-            y=140,
+            y=130,
             anchor="n"
         )
 
@@ -431,12 +431,12 @@ class AnalyticsPage(ctk.CTkFrame):
 
         button_frame = ctk.CTkFrame(
             self,
-            fg_color="transparent"
+            fg_color="#EDF3FF"
         )
 
         button_frame.place(
             relx=0.5,
-            y=280,
+            y=290,
             anchor="center"
         )
 
@@ -445,11 +445,12 @@ class AnalyticsPage(ctk.CTkFrame):
         cgpa_button = ctk.CTkButton(
             button_frame,
             text="CGPA",
+            font=("Georgia", 14),
             width=160,
             height=36,
             corner_radius=12,
-            fg_color="#8792AE",
-            hover_color="#7380A3",
+            fg_color="#5B6FB8",
+            hover_color="#394B8A",
             command=self.show_cgpa_graph
         )
 
@@ -461,11 +462,12 @@ class AnalyticsPage(ctk.CTkFrame):
         attendance_button = ctk.CTkButton(
             button_frame,
             text="Attendance",
+            font=("Georgia", 14),
             width=160,
             height=36,
             corner_radius=12,
-            fg_color="#8792AE",
-            hover_color="#7380A3",
+            fg_color="#5B6FB8",
+            hover_color="#394B8A",
             command=self.show_attendance_graph
         )
 
@@ -477,11 +479,12 @@ class AnalyticsPage(ctk.CTkFrame):
         department_button = ctk.CTkButton(
             button_frame,
             text="Departments",
+            font=("Georgia", 14),
             width=160,
             height=36,
             corner_radius=12,
-            fg_color="#8792AE",
-            hover_color="#7380A3",
+            fg_color="#5B6FB8",
+            hover_color="#394B8A",
             command=self.show_department_graph
         )
 
@@ -494,16 +497,16 @@ class AnalyticsPage(ctk.CTkFrame):
 
         self.analytics_frame = ctk.CTkFrame(
             self,
-            width=1130,
-            height=360,
+            width=1100,
+            height=320,
             fg_color="#E8EEFF",
-            corner_radius=30,
+            corner_radius=10,
             border_width=2,
             border_color="#B8C4E8"
         )
 
         self.analytics_frame.place(
-            relx=0.5,
+            relx=0.503,
             y=325,
             anchor="n"
         )
@@ -534,7 +537,7 @@ class AnalyticsPage(ctk.CTkFrame):
         self.topper_card = ctk.CTkFrame(
             self.analytics_frame,
             width=210,
-            height=190,
+            height=150,
             fg_color="#DCE6FF",
             corner_radius=20,
             border_width=2,
@@ -542,8 +545,8 @@ class AnalyticsPage(ctk.CTkFrame):
         )
 
         self.topper_card.place(
-            x=20,
-            y=140
+            x=35,
+            y=75
         )
 
         self.topper_card.pack_propagate(False)
@@ -567,17 +570,18 @@ class AnalyticsPage(ctk.CTkFrame):
             self.analytics_frame,
             text="Export",
             text_color="#FFFFFF",
-            width=100,
-            height=30,
+            width=120,
+            height=40,
             corner_radius=8,
+            font=("Georgia", 15),
             fg_color="#5B6FB8",
             hover_color="#394B8A",
             command=self.export_analytics
         )
 
         self.export_button.place(
-            x=1020,
-            y=15
+            x=68,
+            y=250
         )
 
         # ---------- DEFAULT GRAPH ---------- #
