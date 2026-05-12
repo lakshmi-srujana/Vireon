@@ -223,7 +223,7 @@ class StudentDashboard(ctk.CTkFrame):
         ]
 
         self.fig = plt.Figure(
-            figsize=(5.2, 3.2),
+            figsize=(4.8, 2.8),
             dpi=100
         )
 
@@ -287,8 +287,79 @@ class StudentDashboard(ctk.CTkFrame):
         )
 
         export_button.place(
-            x=490,
-            y=620
+            x=630,
+            y=600
+        )
+
+        # ---------- ANALYTICS FRAME ---------- #
+
+        self.analytics_frame = ctk.CTkFrame(
+            self,
+            width=310,
+            height=200,
+            fg_color="#E8EEFF",
+            corner_radius=10,
+            border_width=2,
+            border_color="#B8C4E8"
+        )
+
+        self.analytics_frame.place(
+            x=980,
+            y=310,
+            anchor="n"
+        )
+
+        self.analytics_frame.pack_propagate(False)
+
+        # ---------- TOP PERFORMERS ---------- #
+
+        self.cursor.execute(
+            """
+            SELECT full_name, cgpa
+            FROM students
+            ORDER BY cgpa DESC
+            LIMIT 3
+            """
+        )
+
+        toppers = self.cursor.fetchall()
+
+        topper_text = "Top Performers\n\n"
+
+        for student in toppers:
+
+            topper_text += (
+                f"{student[0]}  -  CGPA {student[1]}\n"
+            )
+
+        self.topper_card = ctk.CTkFrame(
+            self.analytics_frame,
+            width=240,
+            height=150,
+            fg_color="#DCE6FF",
+            corner_radius=20,
+            border_width=2,
+            border_color="#A8B8E8"
+        )
+
+        self.topper_card.place(
+            x=40,
+            y=30
+        )
+
+        self.topper_card.pack_propagate(False)
+
+        topper_label = ctk.CTkLabel(
+            self.topper_card,
+            text=topper_text,
+            font=("Georgia", 16),
+            text_color="#394B8A",
+            justify="left"
+        )
+
+        topper_label.pack(
+            pady=15,
+            padx=10
         )
 
         # ------------------------------------------------ #
@@ -308,8 +379,8 @@ class StudentDashboard(ctk.CTkFrame):
         )
 
         logout_button.place(
-            x=760,
-            y=620
+            x=900,
+            y=600
         )
 
     # ------------------------------------------------ #
