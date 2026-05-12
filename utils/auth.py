@@ -1,35 +1,57 @@
 import hashlib
-from database.db_connection import get_connection
-
-
-def hash_password(password):
-    return hashlib.sha256(password.encode()).hexdigest()
+import mysql.connector
 
 
 def login_user(username, password):
 
     try:
-        conn = get_connection()
-        cursor = conn.cursor(dictionary=True)
 
-        hashed_password = hash_password(password)
+        connection = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password="root",
+            database="vireon"
+        )
+
+        cursor = connection.cursor(dictionary=True)
+
+        # ---------- HASH ENTERED PASSWORD ---------- #
+
+        hashed_password = hashlib.sha256(
+            password.encode()
+        ).hexdigest()
+
+        # ---------- CHECK USER ---------- #
 
         query = """
         SELECT *
         FROM users
         WHERE username = %s
         AND password_hash = %s
-        AND is_active = TRUE
         """
 
-        cursor.execute(query, (username, hashed_password))
+        values = (
+            username,
+            hashed_password
+        )
+
+        cursor.execute(
+            query,
+            values
+        )
 
         user = cursor.fetchone()
-
-        conn.close()
 
         return user
 
     except Exception as e:
+
         print("Login Error:", e)
+
         return None
+
+    finally:
+
+        cursor.close()
+
+        connection.close()

@@ -536,7 +536,7 @@ class AnalyticsPage(ctk.CTkFrame):
 
         self.topper_card = ctk.CTkFrame(
             self.analytics_frame,
-            width=210,
+            width=230,
             height=150,
             fg_color="#DCE6FF",
             corner_radius=20,
@@ -545,7 +545,7 @@ class AnalyticsPage(ctk.CTkFrame):
         )
 
         self.topper_card.place(
-            x=35,
+            x=25,
             y=75
         )
 

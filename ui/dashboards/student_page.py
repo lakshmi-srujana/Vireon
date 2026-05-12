@@ -1,7 +1,7 @@
 import customtkinter as ctk
 from PIL import Image
 from tkinter import messagebox
-
+import hashlib
 from database.db_connection import get_connection
 
 
@@ -477,6 +477,8 @@ class StudentsPage(ctk.CTkFrame):
 
             cursor = connection.cursor()
 
+            # ---------- INSERT INTO STUDENTS ---------- #
+
             query = """
             INSERT INTO students
             (
@@ -504,16 +506,55 @@ class StudentsPage(ctk.CTkFrame):
                 phone
             )
 
+            cursor.execute(query, values)
+
+            # ---------- AUTO GENERATE PASSWORD ---------- #
+
+            raw_password = (
+                full_name.split()[0].lower()
+                + "@"
+                + roll_no
+            )
+
+            hashed_password = hashlib.sha256(
+                raw_password.encode()
+            ).hexdigest()
+
+            username = full_name.split()[0].lower()
+
+            # ---------- INSERT INTO USERS ---------- #
+
+            user_query = """
+            INSERT INTO users
+            (
+            username,
+            password_hash,
+            role,
+            linked_id
+            )
+            VALUES
+            (%s, %s, %s, %s)
+            """
+
+            user_values = (
+                username,
+                hashed_password,
+                "student",
+                roll_no
+            )
+
             cursor.execute(
-                query,
-                values
+                user_query,
+                user_values
             )
 
             connection.commit()
 
             messagebox.showinfo(
                 "Success",
-                "Student added successfully!"
+                f"Student Added Successfully!\n\n"
+                f"Username: {username}\n"
+                f"Password: {raw_password}"
             )
 
             self.clear_entries()
@@ -703,13 +744,23 @@ class StudentsPage(ctk.CTkFrame):
 
             cursor = connection.cursor()
 
-            query = """
-            DELETE FROM students
-            WHERE roll_no = %s
-            """
+            # ---------- DELETE USER ACCOUNT ---------- #
 
             cursor.execute(
-                query,
+                """
+                DELETE FROM users
+                WHERE linked_id = %s
+                """,
+                (roll_no,)
+            )
+
+            # ---------- DELETE STUDENT ---------- #
+
+            cursor.execute(
+                """
+                DELETE FROM students
+                WHERE roll_no = %s
+                """,
                 (roll_no,)
             )
 
@@ -736,7 +787,6 @@ class StudentsPage(ctk.CTkFrame):
             cursor.close()
 
             connection.close()
-
     # ---------------- CLEAR ENTRIES ---------------- #
 
     def clear_entries(self):

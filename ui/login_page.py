@@ -111,13 +111,27 @@ class LoginPage(ctk.CTkFrame):
     def handle_login(self):
 
         username = self.username_entry.get()
+
         password = self.password_entry.get()
+
+        selected_role = self.role_menu.get()
 
         user = login_user(username, password)
 
         if user:
 
-            role = user['role']
+            role = user["role"]
+
+            # ---------- ROLE VALIDATION ---------- #
+
+            if role.lower() != selected_role.lower():
+
+                messagebox.showerror(
+                    "Role Error",
+                    f"This account is not registered as {selected_role}"
+                )
+
+                return
 
             messagebox.showinfo(
                 "Login Success",
@@ -126,8 +140,43 @@ class LoginPage(ctk.CTkFrame):
 
             self.destroy()
 
-            dashboard = AdminDashboard(self.master)
-            dashboard.pack(fill="both", expand=True)
+            # ---------- ADMIN DASHBOARD ---------- #
+
+            if role.lower() == "admin":
+
+                dashboard = AdminDashboard(self.master)
+
+                dashboard.pack(
+                    fill="both",
+                    expand=True
+                )
+
+            # ---------- STUDENT DASHBOARD ---------- #
+
+            elif role.lower() == "student":
+
+                from ui.dashboards.student_dashboard import (
+                    StudentDashboard
+                )
+
+                dashboard = StudentDashboard(
+                    self.master,
+                    user["linked_id"]
+                )
+
+                dashboard.pack(
+                    fill="both",
+                    expand=True
+                )
+
+            # ---------- FACULTY DASHBOARD ---------- #
+
+            elif role.lower() == "faculty":
+
+                messagebox.showinfo(
+                    "Faculty Dashboard",
+                    "Faculty dashboard coming soon!"
+                )
 
         else:
 
