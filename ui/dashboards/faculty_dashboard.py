@@ -2,6 +2,7 @@ import customtkinter as ctk
 import mysql.connector
 
 from PIL import Image
+import csv
 
 from tkinter import filedialog
 from tkinter import messagebox
@@ -82,8 +83,6 @@ class FacultyDashboard(ctk.CTkFrame):
         # ANALYTICS
         # ------------------------------------------------ #
 
-        # TOTAL STUDENTS
-
         self.cursor.execute(
             """
             SELECT COUNT(*)
@@ -94,8 +93,6 @@ class FacultyDashboard(ctk.CTkFrame):
         )
 
         self.total_students = self.cursor.fetchone()[0]
-
-        # AVERAGE CGPA
 
         self.cursor.execute(
             """
@@ -109,8 +106,6 @@ class FacultyDashboard(ctk.CTkFrame):
         avg = self.cursor.fetchone()[0]
 
         self.avg_cgpa = round(avg, 2)
-
-        # LOW ATTENDANCE
 
         self.cursor.execute(
             """
@@ -174,7 +169,7 @@ class FacultyDashboard(ctk.CTkFrame):
             height=60
         )
 
-        title.place(x=375, y=35)
+        title.place(x=375, y=25)
 
         # ------------------------------------------------ #
         # PROFILE CARD
@@ -182,7 +177,7 @@ class FacultyDashboard(ctk.CTkFrame):
 
         profile_card = ctk.CTkFrame(
             self,
-            width=300,
+            width=280,
             height=430,
             fg_color="#EEF3FF",
             corner_radius=25,
@@ -190,12 +185,12 @@ class FacultyDashboard(ctk.CTkFrame):
             border_color="#B8C4E8"
         )
 
-        profile_card.place(x=70, y=170)
+        profile_card.place(x=80, y=170)
 
         profile_title = ctk.CTkLabel(
             profile_card,
             text="Faculty Profile",
-            font=("Georgia", 24, "bold"),
+            font=("Georgia", 20, "bold"),
             text_color="#5B6FB8"
         )
 
@@ -219,14 +214,14 @@ class FacultyDashboard(ctk.CTkFrame):
             label = ctk.CTkLabel(
                 profile_card,
                 text=detail,
-                font=("Georgia", 16),
+                font=("Georgia", 15),
                 text_color="#394B8A",
                 anchor="w"
             )
 
             label.pack(
                 pady=8,
-                padx=25,
+                padx=20,
                 anchor="w"
             )
 
@@ -236,15 +231,15 @@ class FacultyDashboard(ctk.CTkFrame):
 
         graph_card = ctk.CTkFrame(
             self,
-            width=750,
-            height=400,
+            width=490,
+            height=430,
             fg_color="#EEF3FF",
             corner_radius=25,
             border_width=3,
             border_color="#B8C4E8"
         )
 
-        graph_card.place(x=420, y=170)
+        graph_card.place(x=400, y=120)
 
         graph_title = ctk.CTkLabel(
             graph_card,
@@ -272,7 +267,7 @@ class FacultyDashboard(ctk.CTkFrame):
         ]
 
         self.fig = plt.Figure(
-            figsize=(4.5, 2.8),
+            figsize=(3, 2.4),
             dpi=100
         )
 
@@ -299,17 +294,13 @@ class FacultyDashboard(ctk.CTkFrame):
         canvas.draw()
 
         canvas.get_tk_widget().pack(
-            pady=10
+            pady=5
         )
-
-        # ------------------------------------------------ #
-        # PERFORMANCE LABEL
-        # ------------------------------------------------ #
 
         performance_label = ctk.CTkLabel(
             graph_card,
             text=self.performance,
-            font=("Georgia", 18, "bold"),
+            font=("Georgia",14, "bold"),
             text_color="#5B6FB8"
         )
 
@@ -318,26 +309,20 @@ class FacultyDashboard(ctk.CTkFrame):
         )
 
         # ------------------------------------------------ #
-        # TOP STUDENTS CARD
+        # TOPPER CARD
         # ------------------------------------------------ #
 
-        analytics_frame = ctk.CTkFrame(
+        topper_frame = ctk.CTkFrame(
             self,
-            width=310,
-            height=200,
-            fg_color="#E8EEFF",
-            corner_radius=10,
+            width=240,
+            height=230,
+            fg_color="#EEF3FF",
+            corner_radius=20,
             border_width=2,
             border_color="#B8C4E8"
         )
 
-        analytics_frame.place(
-            x=980,
-            y=310,
-            anchor="n"
-        )
-
-        analytics_frame.pack_propagate(False)
+        topper_frame.place(x=850, y=120)
 
         self.cursor.execute(
             """
@@ -359,73 +344,167 @@ class FacultyDashboard(ctk.CTkFrame):
         for student in toppers:
 
             topper_text += (
-                f"{student[0]}  -  CGPA {student[1]}\n"
+                f"{student[0]}\nCGPA : {student[1]}\n\n"
             )
 
-        topper_card = ctk.CTkFrame(
-            analytics_frame,
-            width=240,
-            height=150,
-            fg_color="#DCE6FF",
-            corner_radius=20,
-            border_width=2,
-            border_color="#A8B8E8"
-        )
-
-        topper_card.place(
-            x=40,
-            y=30
-        )
-
-        topper_card.pack_propagate(False)
-
         topper_label = ctk.CTkLabel(
-            topper_card,
+            topper_frame,
             text=topper_text,
-            font=("Georgia", 16),
-            text_color="#394B8A",
-            justify="left"
+            justify="left",
+            font=("Georgia", 15),
+            text_color="#394B8A"
         )
 
-        topper_label.pack(
-            pady=15,
-            padx=10
+        topper_label.place(
+            x=20,
+            y=20
         )
 
         # ------------------------------------------------ #
-        # EXPORT BUTTON
+        # BONUS FRAME
+        # ------------------------------------------------ #
+
+        bonus_frame = ctk.CTkFrame(
+            self,
+            width=240,
+            height=170,
+            fg_color="#EEF3FF",
+            corner_radius=20,
+            border_width=2,
+            border_color="#B8C4E8"
+        )
+
+        bonus_frame.place(x=850, y=370)
+
+        self.roll_entry = ctk.CTkEntry(
+            bonus_frame,
+            width=180,
+            placeholder_text="Roll No",
+            font=("Georgia", 12),
+        )
+
+        self.roll_entry.place(
+            x=30,
+            y=20
+        )
+
+        self.bonus_entry = ctk.CTkEntry(
+            bonus_frame,
+            width=180,
+            placeholder_text="Bonus CGPA",
+            font=("Georgia", 12),
+        )
+
+        self.bonus_entry.place(
+            x=30,
+            y=60
+        )
+
+        bonus_button = ctk.CTkButton(
+            bonus_frame,
+            text="Add Bonus",
+            width=180,
+            font=("Georgia", 12),
+            fg_color="#8792AE",
+            command=self.add_bonus_marks
+        )
+
+        bonus_button.place(
+            x=30,
+            y=100
+        )
+
+        csv_button = ctk.CTkButton(
+            bonus_frame,
+            text="Export CSV",
+            width=180,
+            font=("Georgia", 12),
+            fg_color="#5B6FB8",
+            command=self.export_toppers_csv
+        )
+
+        csv_button.place(
+            x=30,
+            y=135
+        )
+
+        # ------------------------------------------------ #
+        # STUDENT TABLE
+        # ------------------------------------------------ #
+
+        student_frame = ctk.CTkFrame(
+            self,
+            width=400,
+            height=120,
+            fg_color="#EEF3FF",
+            corner_radius=20,
+            border_width=2,
+            border_color="#B8C4E8"
+        )
+
+        student_frame.place(
+            x=365,
+            y=460
+        )
+
+        student_title = ctk.CTkLabel(
+            student_frame,
+            text=f"{self.department} Students",
+            font=("Georgia", 18, "bold"),
+            text_color="#5B6FB8"
+        )
+
+        student_title.place(
+            x=20,
+            y=5
+        )
+
+        self.student_box = ctk.CTkTextbox(
+            student_frame,
+            width=350,
+            height=70,
+            font=("Consolas", 11),
+            text_color="#394B8A",
+            fg_color="#DCE6FF"
+        )
+
+        self.student_box.place(
+            x=20,
+            y=40
+        )
+
+        self.refresh_students()
+
+        # ------------------------------------------------ #
+        # BOTTOM BUTTONS
         # ------------------------------------------------ #
 
         export_button = ctk.CTkButton(
             self,
             text="Download Report",
             width=220,
-            height=50,
+            height=40,
             corner_radius=18,
             fg_color="#8792AE",
             hover_color="#7380A3",
-            font=("Georgia", 18),
+            font=("Georgia", 16),
             command=self.export_report
         )
 
         export_button.place(
-            x=630,
+            x=670,
             y=600
         )
-
-        # ------------------------------------------------ #
-        # LOGOUT BUTTON
-        # ------------------------------------------------ #
 
         logout_button = ctk.CTkButton(
             self,
             text="Logout",
             width=150,
-            height=50,
+            height=40,
             corner_radius=18,
             fg_color="#C27A86",
             hover_color="#AA6570",
-            font=("Georgia", 18),
+            font=("Georgia", 16),
             command=self.logout
         )
 
@@ -433,6 +512,196 @@ class FacultyDashboard(ctk.CTkFrame):
             x=900,
             y=600
         )
+
+    # ------------------------------------------------ #
+    # REFRESH STUDENTS
+    # ------------------------------------------------ #
+
+    def refresh_students(self):
+
+        self.student_box.delete(
+            "0.0",
+            "end"
+        )
+
+        self.cursor.execute(
+            """
+            SELECT
+            roll_no,
+            full_name,
+            cgpa,
+            attendance
+
+            FROM students
+
+            WHERE department = %s
+
+            ORDER BY cgpa DESC
+            """,
+            (self.department,)
+        )
+
+        students = self.cursor.fetchall()
+
+        student_text = ""
+
+        for student in students:
+
+            student_text += (
+                f"{student[0]}   "
+                f"{student[1]}   "
+                f"CGPA:{student[2]}   "
+                f"ATT:{student[3]}%\n"
+            )
+
+        self.student_box.insert(
+            "0.0",
+            student_text
+        )
+
+    # ------------------------------------------------ #
+    # BONUS MARKS
+    # ------------------------------------------------ #
+
+    def add_bonus_marks(self):
+
+        try:
+
+            roll_no = self.roll_entry.get()
+
+            bonus = float(
+                self.bonus_entry.get()
+            )
+
+            self.cursor.execute(
+                """
+                SELECT cgpa
+                FROM students
+                WHERE roll_no = %s
+                AND department = %s
+                """,
+                (
+                    roll_no,
+                    self.department
+                )
+            )
+
+            result = self.cursor.fetchone()
+
+            if not result:
+
+                messagebox.showerror(
+                    "Error",
+                    "Student not found!"
+                )
+
+                return
+
+            current_cgpa = float(result[0])
+
+            updated_cgpa = current_cgpa + bonus
+
+            if updated_cgpa > 10:
+                updated_cgpa = 10
+
+            self.cursor.execute(
+                """
+                UPDATE students
+                SET cgpa = %s
+                WHERE roll_no = %s
+                AND department = %s
+                """,
+                (
+                    updated_cgpa,
+                    roll_no,
+                    self.department
+                )
+            )
+
+            self.connection.commit()
+
+            self.refresh_students()
+
+            messagebox.showinfo(
+                "Success",
+                f"Updated CGPA to {updated_cgpa}"
+            )
+
+        except Exception as e:
+
+            messagebox.showerror(
+                "Error",
+                str(e)
+            )
+
+    # ------------------------------------------------ #
+    # EXPORT CSV
+    # ------------------------------------------------ #
+
+    def export_toppers_csv(self):
+
+        try:
+
+            save_path = filedialog.asksaveasfilename(
+                defaultextension=".csv",
+                filetypes=[("CSV Files", "*.csv")],
+                initialfile=f"{self.department}_Toppers.csv"
+            )
+
+            if not save_path:
+                return
+
+            self.cursor.execute(
+                """
+                SELECT
+                roll_no,
+                full_name,
+                cgpa,
+                attendance
+
+                FROM students
+
+                WHERE department = %s
+
+                ORDER BY cgpa DESC
+
+                LIMIT 10
+                """,
+                (self.department,)
+            )
+
+            students = self.cursor.fetchall()
+
+            with open(
+                save_path,
+                mode="w",
+                newline=""
+            ) as file:
+
+                writer = csv.writer(file)
+
+                writer.writerow(
+                    [
+                        "Roll No",
+                        "Name",
+                        "CGPA",
+                        "Attendance"
+                    ]
+                )
+
+                writer.writerows(students)
+
+            messagebox.showinfo(
+                "Success",
+                "CSV exported successfully!"
+            )
+
+        except Exception as e:
+
+            messagebox.showerror(
+                "Error",
+                str(e)
+            )
 
     # ------------------------------------------------ #
     # EXPORT REPORT
@@ -486,8 +755,6 @@ class FacultyDashboard(ctk.CTkFrame):
             <b>Designation:</b> {self.designation}<br/>
             <b>Total Students:</b> {self.total_students}<br/>
             <b>Average CGPA:</b> {self.avg_cgpa}<br/>
-            <b>Email:</b> {self.email}<br/>
-            <b>Phone:</b> {self.phone}<br/>
             """
 
             paragraph = Paragraph(
@@ -503,25 +770,11 @@ class FacultyDashboard(ctk.CTkFrame):
 
             graph = PDFImage(
                 graph_path,
-                width=400,
-                height=250
+                width=350,
+                height=220
             )
 
             elements.append(graph)
-
-            elements.append(
-                Spacer(1, 20)
-            )
-
-            remarks = Paragraph(
-                f"""
-                <b>Department Remark:</b>
-                {self.performance}
-                """,
-                styles["BodyText"]
-            )
-
-            elements.append(remarks)
 
             doc.build(elements)
 
