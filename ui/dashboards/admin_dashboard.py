@@ -4,6 +4,7 @@ from ui.dashboards.student_page import StudentsPage
 from ui.dashboards.analytics_page import AnalyticsPage
 from ui.dashboards.faculty_page import FacultyPage
 from ui.dashboards.users import UsersPage
+from ui.dashboards.audit_log_page import AuditLogPage
 
 
 class AdminDashboard(ctk.CTkFrame):
@@ -56,6 +57,8 @@ class AdminDashboard(ctk.CTkFrame):
                 button_command = self.open_faculty_page
             elif text == "Users":
                 button_command = self.open_users_page
+            elif text == "Audit Log":
+                button_command = self.open_audit_logs
             else:
                 button_command = None
 
@@ -287,6 +290,18 @@ class AdminDashboard(ctk.CTkFrame):
         )
 
         users_page.pack(
+            fill="both",
+            expand=True
+        )
+    def open_audit_logs(self):
+
+        self.destroy()
+
+        page = AuditLogPage(
+            self.master
+        )
+
+        page.pack(
             fill="both",
             expand=True
         )
