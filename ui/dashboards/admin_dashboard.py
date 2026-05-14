@@ -2,6 +2,7 @@ import customtkinter as ctk
 from PIL import Image
 from ui.dashboards.student_page import StudentsPage
 from ui.dashboards.analytics_page import AnalyticsPage
+from ui.dashboards.faculty_page import FacultyPage
 
 
 class AdminDashboard(ctk.CTkFrame):
@@ -50,6 +51,8 @@ class AdminDashboard(ctk.CTkFrame):
                 button_command = self.open_students
             elif text == "Analytics":
                 button_command = self.open_analytics
+            elif text == "Faculty":
+                button_command = self.open_faculty_page
             else:
                 button_command = None
 
@@ -256,8 +259,24 @@ class AdminDashboard(ctk.CTkFrame):
         analytics_window.focus_force()
 
         analytics_window.grab_set()
+    def open_faculty_page(self):
 
+        faculty_window = ctk.CTkToplevel(self)
 
+        faculty_window.geometry("1200x700+160+70")
+        faculty_window.title("Vireon")
+        faculty_window.resizable(False, False)
+
+        page = FacultyPage(faculty_window)
+        page.pack(fill="both", expand=True)
+
+        self.master.withdraw()
+
+        def on_close():
+            faculty_window.destroy()
+            self.master.deiconify()
+        faculty_window.protocol("WM_DELETE_WINDOW", on_close)
+        
 if __name__ == "__main__":
 
     ctk.set_appearance_mode("light")

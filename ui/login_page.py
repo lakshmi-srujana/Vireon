@@ -173,9 +173,18 @@ class LoginPage(ctk.CTkFrame):
 
             elif role.lower() == "faculty":
 
-                messagebox.showinfo(
-                    "Faculty Dashboard",
-                    "Faculty dashboard coming soon!"
+                from ui.dashboards.faculty_dashboard import (
+                    FacultyDashboard
+                )
+
+                dashboard = FacultyDashboard(
+                    self.master,
+                    user["linked_id"]
+                )
+
+                dashboard.pack(
+                    fill="both",
+                    expand=True
                 )
 
         else:
