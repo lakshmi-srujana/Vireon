@@ -5,6 +5,10 @@ from ui.dashboards.analytics_page import AnalyticsPage
 from ui.dashboards.faculty_page import FacultyPage
 from ui.dashboards.users import UsersPage
 from ui.dashboards.audit_log_page import AuditLogPage
+import pandas as pd
+from tkinter import filedialog
+from tkinter import messagebox
+import mysql.connector
 
 
 class AdminDashboard(ctk.CTkFrame):
@@ -63,6 +67,8 @@ class AdminDashboard(ctk.CTkFrame):
                 button_command = self.logout
             elif text == "Dashboard":  
                 button_command = self.open_dashboard
+            elif text == "Export CSV":
+                button_command = self.open_export_center
             else:
                 button_command = None
 
@@ -98,7 +104,8 @@ class AdminDashboard(ctk.CTkFrame):
             hover_color="#7380A3",
             text_color="#F5F8F9",
             border_width=0,
-            font=("Georgia", 16)
+            font=("Georgia", 16),
+            command=self.logout
         )
 
         logout_button.place(x=105, y=600)
@@ -335,6 +342,178 @@ class AdminDashboard(ctk.CTkFrame):
             fill="both",
             expand=True
         )
+    # ------------------------------------------------ #
+    # EXPORT CENTER
+    # ------------------------------------------------ #
+
+    def open_export_center(self):
+
+        export_window = ctk.CTkToplevel(self)
+
+        export_window.title("Vireon Export Center")
+
+        export_window.geometry(
+            "500x420+500+200"
+        )
+
+        export_window.configure(
+            fg_color="#EEF3FF"
+        )
+
+        export_window.grab_set()
+
+        # ------------------------------------------------ #
+        # TITLE
+        # ------------------------------------------------ #
+
+        title = ctk.CTkLabel(
+            export_window,
+            text="Export Center",
+            font=("Georgia", 32, "bold"),
+            text_color="#4D63B3"
+        )
+
+        title.pack(
+            pady=(30, 20)
+        )
+
+        # ------------------------------------------------ #
+        # EXPORT STUDENTS
+        # ------------------------------------------------ #
+
+        students_button = ctk.CTkButton(
+            export_window,
+            text="Export Students CSV",
+            width=300,
+            height=50,
+            fg_color="#5B6FB8",
+            hover_color="#445AA8",
+            font=("Georgia", 20),
+            command=lambda:self.export_table_csv("students")
+        )
+
+        students_button.pack(
+            pady=12
+        )
+
+        # ------------------------------------------------ #
+        # EXPORT FACULTY
+        # ------------------------------------------------ #
+
+        faculty_button = ctk.CTkButton(
+            export_window,
+            text="Export Faculty CSV",
+            width=300,
+            height=50,
+            fg_color="#5B6FB8",
+            hover_color="#445AA8",
+            font=("Georgia", 20),
+            command=lambda: self.export_table_csv("faculty")
+        )
+
+        faculty_button.pack(
+            pady=12
+        )
+
+        # ------------------------------------------------ #
+        # EXPORT USERS
+        # ------------------------------------------------ #
+
+        users_button = ctk.CTkButton(
+            export_window,
+            text="Export Users CSV",
+            width=300,
+            height=50,
+            fg_color="#5B6FB8",
+            hover_color="#445AA8",
+            font=("Georgia", 20),
+            command=lambda:self.export_table_csv("users")
+        )
+
+        users_button.pack(
+            pady=12
+        )
+
+        # ------------------------------------------------ #
+        # EXPORT AUDIT LOGS
+        # ------------------------------------------------ #
+
+        logs_button = ctk.CTkButton(
+            export_window,
+            text="Export Audit Logs CSV",
+            width=300,
+            height=50,
+            fg_color="#5B6FB8",
+            hover_color="#445AA8",
+            font=("Georgia", 20),
+            command=lambda:self.export_table_csv("audit_logs")
+        )
+
+        logs_button.pack(
+            pady=12
+        )
+    # ------------------------------------------------ #
+    # EXPORT FUNCTION
+    # ------------------------------------------------ #
+
+    def export_table_csv(self, table_name):
+
+        try:
+
+            connection = mysql.connector.connect(
+                host="localhost",
+                user="root",
+                password="root",
+                database="vireon"
+            )
+
+            cursor = connection.cursor()
+
+            cursor.execute(
+                f"SELECT * FROM {table_name}"
+            )
+
+            data = cursor.fetchall()
+
+            columns = [
+                column[0]
+                for column in cursor.description
+            ]
+
+            df = pd.DataFrame(
+                data,
+                columns=columns
+            )
+
+            file_path = filedialog.asksaveasfilename(
+                defaultextension=".csv",
+                filetypes=[
+                    ("CSV files", "*.csv")
+                ],
+                title=f"Save {table_name} CSV"
+            )
+
+            if file_path:
+
+                df.to_csv(
+                    file_path,
+                    index=False
+                )
+
+                messagebox.showinfo(
+                    "Export Success",
+                    f"{table_name} exported successfully!"
+                )
+
+            cursor.close()
+            connection.close()
+
+        except Exception as e:
+
+            messagebox.showerror(
+                "Export Error",
+                str(e)
+            )
             
 if __name__ == "__main__":
 
