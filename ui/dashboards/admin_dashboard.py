@@ -59,6 +59,10 @@ class AdminDashboard(ctk.CTkFrame):
                 button_command = self.open_users_page
             elif text == "Audit Log":
                 button_command = self.open_audit_logs
+            elif text == "Logout":
+                button_command = self.logout
+            elif text == "Dashboard":  
+                button_command = self.open_dashboard
             else:
                 button_command = None
 
@@ -305,7 +309,33 @@ class AdminDashboard(ctk.CTkFrame):
             fill="both",
             expand=True
         )
-        
+    def logout(self):
+
+        self.destroy()
+
+        from ui.login_page import LoginPage
+
+        login_page = LoginPage(
+            self.master
+        )
+
+        login_page.pack(
+            fill="both",
+            expand=True
+        )
+    def open_dashboard(self):
+
+        self.destroy()
+
+        dashboard = AdminDashboard(
+            self.master
+        )
+
+        dashboard.pack(
+            fill="both",
+            expand=True
+        )
+            
 if __name__ == "__main__":
 
     ctk.set_appearance_mode("light")
