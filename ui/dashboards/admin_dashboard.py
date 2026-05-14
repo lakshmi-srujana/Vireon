@@ -9,6 +9,11 @@ import pandas as pd
 from tkinter import filedialog
 from tkinter import messagebox
 import mysql.connector
+import matplotlib.pyplot
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import (
+    FigureCanvasTkAgg
+)
 
 
 class AdminDashboard(ctk.CTkFrame):
@@ -35,7 +40,18 @@ class AdminDashboard(ctk.CTkFrame):
 
         self.bg_image = bg_image
 
+        # ------------------------------------------------ #
+        # MYSQL CONNECTION
+        # ------------------------------------------------ #
 
+        self.connection = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password="root",
+            database="vireon"
+        )
+
+        self.cursor = self.connection.cursor()
 
         # ---------------- SIDEBAR ITEMS ---------------- #
 
@@ -63,8 +79,6 @@ class AdminDashboard(ctk.CTkFrame):
                 button_command = self.open_users_page
             elif text == "Audit Log":
                 button_command = self.open_audit_logs
-            elif text == "Logout":
-                button_command = self.logout
             elif text == "Dashboard":  
                 button_command = self.open_dashboard
             elif text == "Export CSV":
@@ -110,14 +124,177 @@ class AdminDashboard(ctk.CTkFrame):
 
         logout_button.place(x=105, y=600)
 
+        # ------------------------------------------------ #
+        # PERFORMANCE ANALYTICS GRAPH
+        # ------------------------------------------------ #
 
-        # ---------------- DASHBOARD CARDS ---------------- #
+        graph_frame = ctk.CTkFrame(
+            self,
+            width=400,
+            height=250,
+            fg_color="#EDF3FF",
+            corner_radius=1
+        )
+
+        graph_frame.place(
+            x=310,
+            y=390
+        )
+
+        graph_title = ctk.CTkLabel(
+            graph_frame,
+            text="Department Analytics",
+            text_color="#5976BA",
+            font=("Georgia", 24),
+            fg_color="transparent"
+        )
+
+        graph_title.place(
+            x=25,
+            y=15
+        )
+
+        # ------------------------------------------------ #
+        # FETCH GRAPH DATA
+        # ------------------------------------------------ #
+
+        self.cursor.execute(
+            """
+            SELECT
+            department,
+            average_attendance
+
+            FROM department_summary
+            """
+        )
+
+        graph_data = self.cursor.fetchall()
+
+        departments = []
+        attendance = []
+
+        for row in graph_data:
+
+            departments.append(row[0])
+            attendance.append(float(row[1]))
+
+        # ------------------------------------------------ #
+        # CREATE MATPLOTLIB GRAPH
+        # ------------------------------------------------ #
+
+        fig, ax = plt.subplots(
+            figsize=(4.6, 2.5),
+            dpi=100
+        )
+
+        fig.patch.set_facecolor("#EDF3FF")
+
+        ax.set_facecolor("#EDF3FF")
+
+        ax.plot(
+            departments,
+            attendance,
+            marker="o",
+            linewidth=2
+        )
+
+        ax.set_title(
+            "Average Attendance"
+        )
+
+        # ------------------------------------------------ #
+        # EMBED GRAPH
+        # ------------------------------------------------ #
+
+        canvas = FigureCanvasTkAgg(
+            fig,
+            master=graph_frame
+        )
+
+        canvas.draw()
+        plt.close(fig)
+
+        canvas.get_tk_widget().place(
+            x=15,
+            y=60
+        )
+        # ------------------------------------------------ #
+        # TOP PERFORMERS PANEL
+        # ------------------------------------------------ #
+
+        leaderboard_panel = ctk.CTkFrame(
+            self,
+            width=360,
+            height=220,
+            fg_color="#EDF3FF",
+            corner_radius=1
+        )
+
+        leaderboard_panel.place(
+            x=780,
+            y=420
+        )
+
+        leaderboard_title = ctk.CTkLabel(
+            leaderboard_panel,
+            text="Top Performers",
+            text_color="#5976BA",
+            font=("Georgia", 24),
+            fg_color="transparent"
+        )
+
+        leaderboard_title.place(
+            x=35,
+            y=20
+        )
+
+        # ------------------------------------------------ #
+        # FETCH DASHBOARD STATS
+        # ------------------------------------------------ #
+
+        # Total Students
+        self.cursor.execute(
+            "SELECT COUNT(*) FROM students"
+        )
+
+        total_students = self.cursor.fetchone()[0]
+
+        # Total Faculty
+        self.cursor.execute(
+            "SELECT COUNT(*) FROM faculty"
+        )
+
+        total_faculty = self.cursor.fetchone()[0]
+
+        # Average Attendance
+        self.cursor.execute(
+            """
+            SELECT ROUND(AVG(attendance), 0)
+            FROM students
+            """
+        )
+
+        average_attendance = self.cursor.fetchone()[0]
+
+        # Attendance Alerts
+        self.cursor.execute(
+            """
+            SELECT COUNT(*)
+            FROM attendance_alerts
+            """
+        )
+
+        total_alerts = self.cursor.fetchone()[0]
+
+        # ------------------------------------------------ #
+        # DASHBOARD CARDS
+        # ------------------------------------------------ #
 
         cards = [
-            ("520", "Students", 330),
-            ("48", "Faculty", 530),
-            ("92%", "Attendance", 730),
-            ("12", "Alerts", 930)
+            (str(total_students), "Students", 330),
+            (str(total_faculty), "Faculty", 530),
+            (f"{average_attendance}%", "Attendance", 730),
+            (str(total_alerts), "Alerts", 930)
         ]
 
         for value, label, x in cards:
@@ -140,7 +317,11 @@ class AdminDashboard(ctk.CTkFrame):
                 fg_color="transparent"
             )
 
-            value_label.place(relx=0.5, rely=0.38, anchor="center")
+            value_label.place(
+                relx=0.5,
+                rely=0.38,
+                anchor="center"
+            )
 
             text_label = ctk.CTkLabel(
                 card,
@@ -150,68 +331,31 @@ class AdminDashboard(ctk.CTkFrame):
                 fg_color="transparent"
             )
 
-            text_label.place(relx=0.5, rely=0.72, anchor="center")
+            text_label.place(
+                relx=0.5,
+                rely=0.72,
+                anchor="center"
+            )
 
-        # ---------------- ANALYTICS PANEL ---------------- #
+        # ------------------------------------------------ #
+        # TOP PERFORMERS
+        # ------------------------------------------------ #
 
-        analytics_panel = ctk.CTkFrame(
-            self,
-            width=420,
-            height=210,
-            fg_color="#EDF3FF",
-            corner_radius=10
+        self.cursor.execute(
+            """
+            SELECT
+            full_name,
+            attendance
+
+            FROM students
+
+            ORDER BY attendance DESC
+
+            LIMIT 4
+            """
         )
 
-        analytics_panel.place(x=310, y=420)
-
-        analytics_title = ctk.CTkLabel(
-            analytics_panel,
-            text="Performance Analytics",
-            text_color="#5976BA",
-            font=("Georgia", 22),
-            fg_color="transparent"
-        )
-
-        analytics_title.place(x=25, y=20)
-
-        analytics_placeholder = ctk.CTkLabel(
-            analytics_panel,
-            text="Graph area",
-            text_color="#8A9CC2",
-            font=("Georgia", 16),
-            fg_color="transparent"
-        )
-
-        analytics_placeholder.place(relx=0.5, rely=0.55, anchor="center")
-
-        # ---------------- TOP PERFORMERS PANEL ---------------- #
-
-        leaderboard_panel = ctk.CTkFrame(
-            self,
-            width=320,
-            height=210,
-            fg_color="#EDF3FF",
-            corner_radius=10
-        )
-
-        leaderboard_panel.place(x=780, y=420)
-
-        leaderboard_title = ctk.CTkLabel(
-            leaderboard_panel,
-            text="Top Performers",
-            text_color="#5976BA",
-            font=("Georgia", 22),
-            fg_color="transparent"
-        )
-
-        leaderboard_title.place(x=25, y=20)
-
-        performers = [
-            ("Aarav", "98%"),
-            ("Diya", "96%"),
-            ("Vihaan", "95%"),
-            ("Meera", "94%")
-        ]
+        performers = self.cursor.fetchall()
 
         y = 70
 
@@ -225,17 +369,23 @@ class AdminDashboard(ctk.CTkFrame):
                 fg_color="transparent"
             )
 
-            name_label.place(x=35, y=y)
+            name_label.place(
+                x=35,
+                y=y
+            )
 
             score_label = ctk.CTkLabel(
                 leaderboard_panel,
-                text=score,
+                text=f"{score}%",
                 text_color="#5976BA",
                 font=("Georgia", 16, "bold"),
                 fg_color="transparent"
             )
 
-            score_label.place(x=235, y=y)
+            score_label.place(
+                x=235,
+                y=y
+            )
 
             y += 32
 
