@@ -3,6 +3,7 @@ import mysql.connector
 
 from PIL import Image
 import csv
+from ui.dashboards.student_page import StudentsPage
 
 from tkinter import filedialog
 from tkinter import messagebox
@@ -118,6 +119,7 @@ class FacultyDashboard(ctk.CTkFrame):
         )
 
         self.low_attendance = self.cursor.fetchone()[0]
+
 
         # ------------------------------------------------ #
         # PERFORMANCE STATUS
@@ -426,6 +428,26 @@ class FacultyDashboard(ctk.CTkFrame):
         csv_button.place(
             x=30,
             y=135
+        )
+        # ------------------------------------------------ #   
+        # ADD/EDIT STUDENTS BUTTON     
+        # ------------------------------------------------ #        
+
+        addstudent_button = ctk.CTkButton(
+            self,
+            text="Add/Edit Students",
+            width=220,
+            height=40,
+            corner_radius=18,
+            fg_color="#8792AE",
+            hover_color="#7380A3",
+            font=("Georgia", 16),
+            command=self.open_students
+        )
+
+        addstudent_button.place(
+            x=440,
+            y=600
         )
 
         # ------------------------------------------------ #
@@ -799,6 +821,29 @@ class FacultyDashboard(ctk.CTkFrame):
     def logout(self):
 
         self.master.destroy()
+
+    # ----------------------------------------------- #
+    # ADD/EDIT STUDENTS
+    # ----------------------------------------------- #
+
+    def open_students(self):
+
+        student_window = ctk.CTkToplevel(self)
+
+        student_window.geometry("1200x700+160+70")
+        student_window.title("Vireon")
+        student_window.resizable(False, False)
+
+        page = StudentsPage(student_window)
+        page.pack(fill="both", expand=True)
+
+        self.master.withdraw()
+
+        def on_close():
+            student_window.destroy()
+            self.master.deiconify()
+
+        student_window.protocol("WM_DELETE_WINDOW", on_close)
 
 
 # ------------------------------------------------ #
