@@ -10,6 +10,7 @@ Vireon is a full-featured **Student Performance Analyzer** desktop application d
 
 ![Splash Screen](assets/images/Normal%20Splash%20Screen.png)
 ![Login Page](assets/images/Normal%20Login%20UI.png)
+![Faculty Dashboard](assets/images/Faculty%20Dashboard.png)
 
 ---
 

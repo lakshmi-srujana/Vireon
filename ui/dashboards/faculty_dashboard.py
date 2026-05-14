@@ -241,7 +241,7 @@ class FacultyDashboard(ctk.CTkFrame):
             border_color="#B8C4E8"
         )
 
-        graph_card.place(x=400, y=120)
+        graph_card.place(x=330, y=120)
 
         graph_title = ctk.CTkLabel(
             graph_card,
@@ -310,6 +310,80 @@ class FacultyDashboard(ctk.CTkFrame):
             pady=(5, 10)
         )
 
+        # ------------------------------------------------ #
+        # ALERTS CARD
+        # ------------------------------------------------ #
+        self.cursor.execute(
+            """
+            SELECT
+            roll_no,
+            full_name,
+            attendance
+
+            FROM attendance_alerts
+
+            ORDER BY created_at DESC
+
+            LIMIT 5
+            """
+        )
+
+        alerts = self.cursor.fetchall()
+        alert_text = ""
+
+        for alert in alerts:
+
+            alert_text += (
+                f"{alert[1]} "
+                f"(Roll: {alert[0]})\n"
+                f"- Attendance: {alert[2]}%\n\n"
+            )
+
+        alert_frame = ctk.CTkFrame(
+            self,
+            width=200,
+            height=140,
+            fg_color="#FFF1F1",
+            corner_radius=20,
+            border_width=2,
+            border_color="#E6A8A8"
+        )
+
+        alert_frame.place(
+            x=625,
+            y=250
+        )
+
+        alert_title = ctk.CTkLabel(
+            alert_frame,
+            text="Attendance Alerts",
+            font=("Georgia", 18, "bold"),
+            text_color="#C25B5B"
+        )
+
+        alert_title.place(
+            x=18,
+            y=10
+        )
+
+        alert_box = ctk.CTkTextbox(
+            alert_frame,
+            width=170,
+            height=70,
+            fg_color="#FFE7E7",
+            text_color="#A94442",
+            font=("Georgia", 12)
+        )
+
+        alert_box.place(
+            x=18,
+            y=55
+        )
+
+        alert_box.insert(
+            "0.0",
+            alert_text
+        )
         # ------------------------------------------------ #
         # TOPPER CARD
         # ------------------------------------------------ #
