@@ -3,6 +3,7 @@ from PIL import Image
 from ui.dashboards.student_page import StudentsPage
 from ui.dashboards.analytics_page import AnalyticsPage
 from ui.dashboards.faculty_page import FacultyPage
+from ui.dashboards.users import UsersPage
 
 
 class AdminDashboard(ctk.CTkFrame):
@@ -53,6 +54,8 @@ class AdminDashboard(ctk.CTkFrame):
                 button_command = self.open_analytics
             elif text == "Faculty":
                 button_command = self.open_faculty_page
+            elif text == "Users":
+                button_command = self.open_users_page
             else:
                 button_command = None
 
@@ -276,6 +279,17 @@ class AdminDashboard(ctk.CTkFrame):
             faculty_window.destroy()
             self.master.deiconify()
         faculty_window.protocol("WM_DELETE_WINDOW", on_close)
+    def open_users_page(self):
+        self.destroy()
+
+        users_page = UsersPage(
+            self.master
+        )
+
+        users_page.pack(
+            fill="both",
+            expand=True
+        )
         
 if __name__ == "__main__":
 
