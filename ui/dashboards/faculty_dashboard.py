@@ -166,7 +166,7 @@ class FacultyDashboard(ctk.CTkFrame):
             font=("Georgia", 34, "bold"),
             text_color="#5B6FB8",
             fg_color="#EEF3FF",
-            corner_radius=10,
+            corner_radius=2,
             width=450,
             height=60
         )
@@ -182,7 +182,7 @@ class FacultyDashboard(ctk.CTkFrame):
             width=280,
             height=430,
             fg_color="#EEF3FF",
-            corner_radius=25,
+            corner_radius=5,
             border_width=3,
             border_color="#B8C4E8"
         )
@@ -236,7 +236,7 @@ class FacultyDashboard(ctk.CTkFrame):
             width=490,
             height=430,
             fg_color="#EEF3FF",
-            corner_radius=25,
+            corner_radius=5,
             border_width=3,
             border_color="#B8C4E8"
         )
@@ -246,7 +246,7 @@ class FacultyDashboard(ctk.CTkFrame):
         graph_title = ctk.CTkLabel(
             graph_card,
             text="Department Analytics",
-            font=("Georgia", 24, "bold"),
+            font=("Georgia", 18, "bold"),
             text_color="#5B6FB8"
         )
 
@@ -269,7 +269,7 @@ class FacultyDashboard(ctk.CTkFrame):
         ]
 
         self.fig = plt.Figure(
-            figsize=(3, 2.4),
+            figsize=(2.8, 2.2),
             dpi=100
         )
 
@@ -302,7 +302,7 @@ class FacultyDashboard(ctk.CTkFrame):
         performance_label = ctk.CTkLabel(
             graph_card,
             text=self.performance,
-            font=("Georgia",14, "bold"),
+            font=("Georgia",12, "bold"),
             text_color="#5B6FB8"
         )
 
@@ -344,13 +344,13 @@ class FacultyDashboard(ctk.CTkFrame):
             width=200,
             height=140,
             fg_color="#FFF1F1",
-            corner_radius=20,
+            corner_radius=4,
             border_width=2,
             border_color="#E6A8A8"
         )
 
         alert_frame.place(
-            x=625,
+            x=600,
             y=250
         )
 
@@ -393,7 +393,7 @@ class FacultyDashboard(ctk.CTkFrame):
             width=240,
             height=230,
             fg_color="#EEF3FF",
-            corner_radius=20,
+            corner_radius=4,
             border_width=2,
             border_color="#B8C4E8"
         )
@@ -445,7 +445,7 @@ class FacultyDashboard(ctk.CTkFrame):
             width=240,
             height=170,
             fg_color="#EEF3FF",
-            corner_radius=20,
+            corner_radius=4,
             border_width=2,
             border_color="#B8C4E8"
         )
@@ -512,7 +512,7 @@ class FacultyDashboard(ctk.CTkFrame):
             text="Add/Edit Students",
             width=220,
             height=40,
-            corner_radius=18,
+            corner_radius=3,
             fg_color="#8792AE",
             hover_color="#7380A3",
             font=("Georgia", 16),
@@ -533,7 +533,7 @@ class FacultyDashboard(ctk.CTkFrame):
             width=400,
             height=120,
             fg_color="#EEF3FF",
-            corner_radius=20,
+            corner_radius=3,
             border_width=2,
             border_color="#B8C4E8"
         )
@@ -580,7 +580,7 @@ class FacultyDashboard(ctk.CTkFrame):
             text="Download Report",
             width=220,
             height=40,
-            corner_radius=18,
+            corner_radius=3,
             fg_color="#8792AE",
             hover_color="#7380A3",
             font=("Georgia", 16),
@@ -597,7 +597,7 @@ class FacultyDashboard(ctk.CTkFrame):
             text="Logout",
             width=150,
             height=40,
-            corner_radius=18,
+            corner_radius=3,
             fg_color="#C27A86",
             hover_color="#AA6570",
             font=("Georgia", 16),
