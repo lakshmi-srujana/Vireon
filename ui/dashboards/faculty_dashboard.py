@@ -244,7 +244,7 @@ class FacultyDashboard(ctk.CTkFrame):
         graph_title = ctk.CTkLabel(
             graph_card,
             text="Department Analytics",
-            font=("Georgia", 26, "bold"),
+            font=("Georgia", 24, "bold"),
             text_color="#5B6FB8"
         )
 
