@@ -90,6 +90,12 @@ class LoginPage(ctk.CTkFrame):
 
         forgot_password.place(x=1190, y=635)
 
+        forgot_password.bind(
+            "<Button-1>",
+            lambda e:
+            self.show_forgot_password_message()
+        )
+
         # ---------------- LOGIN BUTTON ---------------- #
 
         login_button = ctk.CTkButton(
@@ -106,6 +112,24 @@ class LoginPage(ctk.CTkFrame):
         )
 
         login_button.place(x=760, y=545)
+
+    def show_forgot_password_message(self):
+
+        selected_role = self.role_menu.get()
+
+        if selected_role.lower() == "admin":
+
+            messagebox.showinfo(
+                "Admin Password Recovery",
+                "Admin password recovery is\nhandled directly through MySQL."
+            )
+
+        else:
+
+            messagebox.showinfo(
+                "Forgot Password",
+                "Please contact the administrator\nfor password reset."
+            )
 
     # ---------------- LOGIN FUNCTION ---------------- #
 
