@@ -4,6 +4,7 @@ import tkinter as tk
 from tkinter import messagebox
 from utils.auth import login_user
 from ui.dashboards.admin_dashboard import AdminDashboard
+from utils.audit import log_audit
 
 
 class LoginPage(ctk.CTkFrame):
@@ -139,6 +140,12 @@ class LoginPage(ctk.CTkFrame):
             )
 
             self.destroy()
+            log_audit(
+                "LOGIN",
+                username,
+                username,
+                role
+            )
 
             # ---------- ADMIN DASHBOARD ---------- #
 
@@ -192,4 +199,10 @@ class LoginPage(ctk.CTkFrame):
             messagebox.showerror(
                 "Login Failed",
                 "Invalid username or password"
+            )
+            log_audit(
+                "FAILED LOGIN",
+                username,
+                username,
+                "unknown"
             )
