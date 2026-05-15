@@ -5,6 +5,7 @@ from tkinter import messagebox
 from utils.auth import login_user
 from ui.dashboards.admin_dashboard import AdminDashboard
 from utils.audit import log_audit
+from utils.resource_path import resource_path
 
 
 class LoginPage(ctk.CTkFrame):
@@ -15,7 +16,7 @@ class LoginPage(ctk.CTkFrame):
         # ---------------- BACKGROUND IMAGE ---------------- #
 
         bg_image = ctk.CTkImage(
-            light_image=Image.open("assets/images/vireon.png"),
+            light_image=Image.open(resource_path("assets/images/vireon.png")),
             size=(1200, 700)
         )
 

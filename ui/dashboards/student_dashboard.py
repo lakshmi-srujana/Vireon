@@ -20,6 +20,7 @@ from reportlab.lib.styles import getSampleStyleSheet
 
 import tempfile
 import os
+from utils.resource_path import resource_path
 
 
 class StudentDashboard(ctk.CTkFrame):
@@ -102,7 +103,7 @@ class StudentDashboard(ctk.CTkFrame):
 
         self.bg_image = ctk.CTkImage(
             light_image=Image.open(
-                "assets/images/vireon_common.png"
+                resource_path("assets/images/vireon_common.png")
             ),
             size=(1200, 700)
         )
@@ -515,7 +516,63 @@ class StudentDashboard(ctk.CTkFrame):
 
     def logout(self):
 
-        self.master.destroy()
+        try:
+
+            connection = mysql.connector.connect(
+                host="localhost",
+                user="root",
+                password="root",
+                database="vireon"
+            )
+
+            cursor = connection.cursor()
+
+            query = """
+            INSERT INTO audit_logs
+            (
+                action_type,
+                performed_by
+            )
+
+            VALUES
+            (
+                %s,
+                %s
+            )
+            """
+
+            cursor.execute(
+                query,
+                (
+                    "LOGOUT",
+                    "admin"
+                )
+            )
+
+            connection.commit()
+
+            cursor.close()
+            connection.close()
+
+        except Exception as e:
+
+            print(
+                "Logout Audit Error:",
+                e
+            )
+
+        self.destroy()
+
+        from ui.login_page import LoginPage
+
+        login_page = LoginPage(
+            self.master
+        )
+
+        login_page.pack(
+            fill="both",
+            expand=True
+        )
 
 
 # ------------------------------------------------ #

@@ -4,6 +4,7 @@ import mysql.connector
 import pandas as pd
 from tkinter import filedialog
 from tkinter import messagebox
+from utils.resource_path import resource_path
 
 
 class UsersPage(ctk.CTkFrame):
@@ -36,7 +37,7 @@ class UsersPage(ctk.CTkFrame):
 
         bg_image = ctk.CTkImage(
             light_image=Image.open(
-                "assets/images/vireon_common.png"
+                resource_path("assets/images/vireon_common.png")
             ),
             size=(1200, 700)
         )

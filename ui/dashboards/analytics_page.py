@@ -12,6 +12,7 @@ from PIL import Image
 import pandas as pd
 from tkinter import filedialog
 from tkinter import messagebox
+from utils.resource_path import resource_path
 
 ctk.set_appearance_mode("light")
 
@@ -354,9 +355,9 @@ class AnalyticsPage(ctk.CTkFrame):
         # ---------- BACKGROUND ---------- #
 
         self.bg_image = ctk.CTkImage(
-            light_image=Image.open(
+            light_image=Image.open(resource_path(
                 "assets/images/vireon_analytics.png"
-            ),
+            )),
             size=(1200, 700)
         )
 

@@ -3,13 +3,14 @@ import mysql.connector
 
 from PIL import Image
 import csv
-from ui.dashboards.student_page import StudentsPage
+from ui.dashboards.student_pagefaculty import StudentsPage
 
 from tkinter import filedialog
 from tkinter import messagebox
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
+from utils.resource_path import resource_path
 
 from reportlab.platypus import (
     SimpleDocTemplate,
@@ -142,9 +143,7 @@ class FacultyDashboard(ctk.CTkFrame):
         # ------------------------------------------------ #
 
         self.bg_image = ctk.CTkImage(
-            light_image=Image.open(
-                "assets/images/vireon_common.png"
-            ),
+            light_image=Image.open(resource_path("assets/images/vireon_common.png")),
             size=(1200, 700)
         )
 
@@ -894,7 +893,63 @@ class FacultyDashboard(ctk.CTkFrame):
 
     def logout(self):
 
-        self.master.destroy()
+        try:
+
+            connection = mysql.connector.connect(
+                host="localhost",
+                user="root",
+                password="root",
+                database="vireon"
+            )
+
+            cursor = connection.cursor()
+
+            query = """
+            INSERT INTO audit_logs
+            (
+                action_type,
+                performed_by
+            )
+
+            VALUES
+            (
+                %s,
+                %s
+            )
+            """
+
+            cursor.execute(
+                query,
+                (
+                    "LOGOUT",
+                    "admin"
+                )
+            )
+
+            connection.commit()
+
+            cursor.close()
+            connection.close()
+
+        except Exception as e:
+
+            print(
+                "Logout Audit Error:",
+                e
+            )
+
+        self.destroy()
+
+        from ui.login_page import LoginPage
+
+        login_page = LoginPage(
+            self.master
+        )
+
+        login_page.pack(
+            fill="both",
+            expand=True
+        )
 
     # ----------------------------------------------- #
     # ADD/EDIT STUDENTS

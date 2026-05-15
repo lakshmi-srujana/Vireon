@@ -1,5 +1,6 @@
 import customtkinter as ctk
 from PIL import Image
+from utils.resource_path import resource_path
 
 
 class SplashScreen(ctk.CTkFrame):
@@ -12,7 +13,7 @@ class SplashScreen(ctk.CTkFrame):
         # ---------------- IMAGE ---------------- #
 
         splash_image = ctk.CTkImage(
-            light_image=Image.open("assets/images/vireon_splashscreen.png"),
+            light_image=Image.open(resource_path("assets/images/vireon_splashscreen.png")),
             size=(1200, 700)
         )
 

@@ -4,6 +4,7 @@ import mysql.connector
 import pandas as pd
 
 from tkinter import filedialog
+from utils.resource_path import resource_path
 from tkinter import messagebox
 
 
@@ -36,9 +37,7 @@ class AuditLogPage(ctk.CTkFrame):
         # ------------------------------------------------ #
 
         bg_image = ctk.CTkImage(
-            light_image=Image.open(
-                "assets/images/vireon_common.png"
-            ),
+            light_image=Image.open(resource_path("assets/images/vireon_common.png")),
             size=(1200, 700)
         )
 

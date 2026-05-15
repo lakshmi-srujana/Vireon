@@ -4,6 +4,7 @@ from tkinter import messagebox
 import hashlib
 
 from database.db_connection import get_connection
+from utils.resource_path import resource_path
 
 
 class FacultyPage(ctk.CTkFrame):
@@ -20,9 +21,7 @@ class FacultyPage(ctk.CTkFrame):
         # ---------------- BACKGROUND ---------------- #
 
         bg_image = ctk.CTkImage(
-            light_image=Image.open(
-                "assets/images/vireon_facultyadmin.png"
-            ),
+            light_image=Image.open(resource_path("assets/images/vireon_facultyadmin.png")),
             size=(1200, 700)
         )
 

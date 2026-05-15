@@ -198,7 +198,7 @@ class StudentsPage(ctk.CTkFrame):
             command=self.update_student
         )
 
-        update_button.place(x=730, y=600)
+        update_button.place(x=790, y=600)
 
         add_button = ctk.CTkButton(
             self,
@@ -213,21 +213,8 @@ class StudentsPage(ctk.CTkFrame):
             command=self.add_student
         )
 
-        add_button.place(x=840, y=600)
+        add_button.place(x=900, y=600)
 
-        delete_button = ctk.CTkButton(
-            self,
-            text="Delete",
-            width=100,
-            height=36,
-            corner_radius=14,
-            fg_color="#B86F7A",
-            hover_color="#A05B67",
-            font=("Georgia", 14),
-            command=self.delete_student
-        )
-
-        delete_button.place(x=990, y=600)
 
         # ---------------- STUDENT TABLE ---------------- #
 
@@ -724,70 +711,6 @@ class StudentsPage(ctk.CTkFrame):
 
             connection.close()
 
-    # ---------------- DELETE STUDENT ---------------- #
-
-    def delete_student(self):
-
-        roll_no = self.roll_entry.get()
-
-        confirm = messagebox.askyesno(
-            "Confirm Delete",
-            "Delete this student?"
-        )
-
-        if not confirm:
-
-            return
-
-        try:
-
-            connection = get_connection()
-
-            cursor = connection.cursor()
-
-            # ---------- DELETE USER ACCOUNT ---------- #
-
-            cursor.execute(
-                """
-                DELETE FROM users
-                WHERE linked_id = %s
-                """,
-                (roll_no,)
-            )
-
-            # ---------- DELETE STUDENT ---------- #
-
-            cursor.execute(
-                """
-                DELETE FROM students
-                WHERE roll_no = %s
-                """,
-                (roll_no,)
-            )
-
-            connection.commit()
-
-            messagebox.showinfo(
-                "Deleted",
-                "Student deleted successfully!"
-            )
-
-            self.clear_entries()
-
-            self.load_students()
-
-        except Exception as e:
-
-            messagebox.showerror(
-                "Delete Error",
-                str(e)
-            )
-
-        finally:
-
-            cursor.close()
-
-            connection.close()
     # ---------------- CLEAR ENTRIES ---------------- #
 
     def clear_entries(self):

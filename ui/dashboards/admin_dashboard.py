@@ -9,6 +9,7 @@ import pandas as pd
 from tkinter import filedialog
 from tkinter import messagebox
 import mysql.connector
+from utils.resource_path import resource_path
 import matplotlib.pyplot
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import (
@@ -26,7 +27,7 @@ class AdminDashboard(ctk.CTkFrame):
         # ---------------- BACKGROUND IMAGE ---------------- #
 
         bg_image = ctk.CTkImage(
-            light_image=Image.open("assets/images/vireon_admindashboard.png"),
+            light_image=Image.open(resource_path("assets/images/vireon_admindashboard.png")),
             size=(1200, 700)
         )
 
@@ -467,6 +468,51 @@ class AdminDashboard(ctk.CTkFrame):
             expand=True
         )
     def logout(self):
+
+        try:
+
+            connection = mysql.connector.connect(
+                host="localhost",
+                user="root",
+                password="root",
+                database="vireon"
+            )
+
+            cursor = connection.cursor()
+
+            query = """
+            INSERT INTO audit_logs
+            (
+                action_type,
+                performed_by
+            )
+
+            VALUES
+            (
+                %s,
+                %s
+            )
+            """
+
+            cursor.execute(
+                query,
+                (
+                    "LOGOUT",
+                    "admin"
+                )
+            )
+
+            connection.commit()
+
+            cursor.close()
+            connection.close()
+
+        except Exception as e:
+
+            print(
+                "Logout Audit Error:",
+                e
+            )
 
         self.destroy()
 
