@@ -135,9 +135,9 @@ python PRN_analyzer.py
 ### Default login credentials (from seed data)
 | Role | Username | Password |
 |---|---|---|
-| Admin | `admin` | `admin123` |
-| Faculty | `faculty1` | `faculty123` |
-| Student | `student1` | `student123` |
+| Admin | `admin` | `*********` |
+| Faculty | `faculty1` | `*********` |
+| Student | `student1` | `*********` |
 
 ---
 

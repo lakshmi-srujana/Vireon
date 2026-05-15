@@ -4,6 +4,8 @@ import tkinter as tk
 from tkinter import messagebox
 from utils.auth import login_user
 from ui.dashboards.admin_dashboard import AdminDashboard
+from ui.dashboards.student_dashboard import StudentDashboard
+from ui.dashboards.faculty_dashboard import FacultyDashboard
 from utils.audit import log_audit
 from utils.resource_path import resource_path
 
@@ -187,10 +189,6 @@ class LoginPage(ctk.CTkFrame):
 
             elif role.lower() == "student":
 
-                from ui.dashboards.student_dashboard import (
-                    StudentDashboard
-                )
-
                 dashboard = StudentDashboard(
                     self.master,
                     user["linked_id"]
@@ -204,10 +202,6 @@ class LoginPage(ctk.CTkFrame):
             # ---------- FACULTY DASHBOARD ---------- #
 
             elif role.lower() == "faculty":
-
-                from ui.dashboards.faculty_dashboard import (
-                    FacultyDashboard
-                )
 
                 dashboard = FacultyDashboard(
                     self.master,
