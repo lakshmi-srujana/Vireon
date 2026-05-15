@@ -174,11 +174,6 @@ vireon/
 ```
 ---
 
-## Application
-![Faculty Dashboard](assets/images/Faculty%20Dashboard.png)
-
----
-
 ## 📄 Deliverables
 
 | File | Description |
