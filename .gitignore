@@ -2,3 +2,11 @@
 __pycache__/
 *.pyc
 .env
+
+# PyInstaller output
+build/
+dist/
+*.spec.bak
+
+# Local generated reports/exports
+reports/

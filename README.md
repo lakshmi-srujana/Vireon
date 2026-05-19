@@ -8,8 +8,18 @@
 
 Vireon is a full-featured **Student Performance Analyzer** desktop application developed as a Database Management Systems Lab mini project. It supports three distinct user roles (Admin, Faculty, Student), enforces secure authentication, logs every data-changing operation, and presents a live analytics dashboard — all packaged as a Windows installer.
 
+![Flowchart](assets/images/vireon%20flowchart.png)
+
 ![Splash Screen](assets/images/Normal%20Splash%20Screen.png)
 ![Login Page](assets/images/Normal%20Login%20UI.png)
+![Admin Dashboard](assets/images/AppSS/admindashboard.png)
+![Admin - Student Page](assets/images/AppSS/studentpage.png)
+![Admin - Analytics Page](assets/images/AppSS/analyticspage.png)
+![Admin - Users Page](assets/images/AppSS/user.png)
+![Admin - Faculty Page](assets/images/AppSS/facultypage.png)
+![Admin - Audit Logs Page](assets/images/AppSS/auditlogs.png)
+![Faculty Dashboard](assets/images/AppSS/facultydashboard.png)
+![Student Dashboard](assets/images/AppSS/studentdashboard.png)
 
 ---
 
@@ -55,8 +65,6 @@ Vireon is a full-featured **Student Performance Analyzer** desktop application d
 - **Indexes** — Roll number, department, and email indexes for query optimization
 - **CTEs** — Ranked students, department comparison queries
 - **Temporary Tables** — Dynamic ranking and attendance ranking tables
-
-![Flowchart](assets/images/vireon%20flowchart.png)
 
 ---
 
