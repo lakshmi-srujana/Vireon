@@ -1,0 +1,424 @@
+-- ======================================================
+-- VIREON PROJECT SQL QUERIES
+-- ======================================================
+
+
+-- Displays all student records from database
+SELECT *
+FROM students;
+
+
+
+-- Displays all faculty records
+SELECT *
+FROM faculty;
+
+
+
+-- ======================================================
+-- VIEW CREATION QUERIES
+-- ======================================================
+
+
+-- Creates a view for top-performing students
+
+CREATE VIEW top_students AS
+
+SELECT
+roll_no,
+full_name,
+department,
+cgpa
+
+FROM students
+
+ORDER BY cgpa DESC;
+
+
+
+-- Creates a department analytics view
+
+CREATE VIEW department_summary AS
+
+SELECT
+
+department,
+
+AVG(cgpa)
+AS average_cgpa,
+
+AVG(attendance)
+AS average_attendance
+
+FROM students
+
+GROUP BY department;
+
+
+
+-- Creates a low attendance monitoring view
+
+CREATE VIEW low_attendance AS
+
+SELECT
+
+roll_no,
+full_name,
+attendance
+
+FROM students
+
+WHERE attendance < 75;
+
+
+
+-- Creates faculty summary view
+
+CREATE VIEW faculty_summary AS
+
+SELECT
+
+department,
+
+COUNT(*)
+AS faculty_count
+
+FROM faculty
+
+GROUP BY department;
+
+
+
+-- ======================================================
+-- VIEW EXECUTION QUERIES
+-- ======================================================
+
+
+-- Displays ranked students
+
+SELECT *
+FROM top_students;
+
+
+
+-- Displays department analytics
+
+SELECT *
+FROM department_summary;
+
+
+
+-- Displays students with low attendance
+
+SELECT *
+FROM low_attendance;
+
+
+
+-- Displays faculty summary
+
+SELECT *
+FROM faculty_summary;
+
+
+
+-- ======================================================
+-- STORED PROCEDURES
+-- ======================================================
+
+
+-- Creates GPA calculation procedure
+
+CREATE PROCEDURE calculate_gpa(
+
+IN student_roll VARCHAR(20),
+
+IN bonus DECIMAL(3,2)
+
+)
+
+BEGIN
+
+UPDATE students
+
+SET cgpa = cgpa + bonus
+
+WHERE roll_no = student_roll;
+
+END;
+
+
+
+-- Executes GPA procedure
+
+CALL calculate_gpa(
+'211',
+0.2
+);
+
+
+
+-- ======================================================
+-- TRIGGER CREATION QUERIES
+-- ======================================================
+
+
+-- Creates audit trigger for insert tracking
+
+CREATE TRIGGER audit_insert
+
+AFTER INSERT
+ON students
+
+FOR EACH ROW
+
+BEGIN
+
+INSERT INTO audit_logs
+(
+action_type,
+student_roll,
+performed_by
+)
+
+VALUES
+(
+'INSERT',
+NEW.roll_no,
+'Admin'
+);
+
+END;
+
+
+
+-- Creates attendance alert trigger
+
+CREATE TRIGGER attendance_warning
+
+AFTER UPDATE
+ON students
+
+FOR EACH ROW
+
+BEGIN
+
+IF NEW.attendance < 75 THEN
+
+INSERT INTO attendance_alerts
+(
+roll_no,
+full_name,
+attendance,
+alert_message
+)
+
+VALUES
+(
+NEW.roll_no,
+NEW.full_name,
+NEW.attendance,
+'Attendance below required threshold'
+);
+
+END IF;
+
+END;
+
+
+
+-- ======================================================
+-- COMMON TABLE EXPRESSIONS
+-- ======================================================
+
+
+-- Filters high attendance students and ranks them by CGPA
+
+WITH high_attendance AS(
+
+SELECT
+
+roll_no,
+full_name,
+attendance,
+cgpa
+
+FROM students
+
+WHERE attendance > 85
+
+)
+
+SELECT
+
+full_name,
+cgpa
+
+FROM high_attendance
+
+ORDER BY cgpa DESC;
+
+
+
+-- Generates department average CGPA statistics
+
+WITH department_stats AS(
+
+SELECT
+
+department,
+
+AVG(cgpa)
+AS average_cgpa
+
+FROM students
+
+GROUP BY department
+
+)
+
+SELECT *
+
+FROM department_stats;
+
+
+
+-- ======================================================
+-- TEMPORARY TABLES
+-- ======================================================
+
+
+-- Creates temporary semester topper table
+
+CREATE TEMPORARY TABLE semester_toppers AS
+
+SELECT
+
+roll_no,
+full_name,
+cgpa
+
+FROM students
+
+ORDER BY cgpa DESC
+
+LIMIT 5;
+
+
+
+-- Displays semester toppers
+
+SELECT *
+
+FROM semester_toppers;
+
+
+
+-- Creates temporary attendance ranking table
+
+CREATE TEMPORARY TABLE attendance_ranking AS
+
+SELECT
+
+roll_no,
+full_name,
+attendance
+
+FROM students
+
+ORDER BY attendance DESC;
+
+
+
+-- Displays attendance ranking
+
+SELECT *
+
+FROM attendance_ranking;
+
+
+
+-- ======================================================
+-- HISTOGRAM QUERIES
+-- ======================================================
+
+
+-- Generates attendance histogram using SQL buckets
+
+SELECT
+
+CASE
+
+WHEN attendance BETWEEN 90 AND 100
+THEN '90-100'
+
+WHEN attendance BETWEEN 80 AND 89
+THEN '80-89'
+
+WHEN attendance BETWEEN 70 AND 79
+THEN '70-79'
+
+ELSE 'Below 70'
+
+END AS Attendance_Range,
+
+COUNT(*) AS Student_Count,
+
+REPEAT('█',COUNT(*))
+AS Histogram
+
+FROM students
+
+GROUP BY Attendance_Range;
+
+
+
+-- ======================================================
+-- ANALYTICS QUERIES
+-- ======================================================
+
+
+-- Displays top 5 students according to CGPA
+
+SELECT
+
+full_name,
+cgpa
+
+FROM students
+
+ORDER BY cgpa DESC
+
+LIMIT 5;
+
+
+
+-- Generates department-wise average CGPA
+
+SELECT
+
+department,
+
+AVG(cgpa)
+
+FROM students
+
+GROUP BY department;
+
+
+
+-- Displays attendance alerts
+
+SELECT *
+
+FROM attendance_alerts;
+
+
+
+-- Displays audit logs
+
+SELECT *
+
+FROM audit_logs
+
+ORDER BY action_time DESC;
