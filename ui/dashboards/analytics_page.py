@@ -110,13 +110,8 @@ class AnalyticsPage(ctk.CTkFrame):
     def export_analytics(self):
 
         self.cursor.execute(
-            """
-            SELECT
-            roll_no,
-            full_name,
-            department,
-            cgpa,
-            attendance
+            f"""
+            SELECT {', '.join(self.export_columns)}
             FROM students
             """
         )
@@ -125,13 +120,7 @@ class AnalyticsPage(ctk.CTkFrame):
 
         df = pd.DataFrame(
             data,
-            columns=[
-                "Roll Number",
-                "Full Name",
-                "Department",
-                "CGPA",
-                "Attendance"
-            ]
+            columns=self.export_headers
         )
 
         file_path = filedialog.asksaveasfilename(
@@ -152,14 +141,63 @@ class AnalyticsPage(ctk.CTkFrame):
                 "Analytics exported successfully!"
             )
 
-    # ---------- CGPA GRAPH ---------- #
+    # ---------- STUDENT TABLE COLUMNS ---------- #
 
-    def show_cgpa_graph(self):
+    def configure_student_columns(self):
+
+        self.cursor.execute(
+            "SHOW COLUMNS FROM students"
+        )
+
+        columns = {
+            column[0]
+            for column in self.cursor.fetchall()
+        }
+
+        self.name_column = "full_name" if "full_name" in columns else "name"
+        self.score_expression = "marks" if "marks" in columns else "(cgpa * 10)"
+
+        if "roll_no" in columns:
+
+            self.export_columns = [
+                "roll_no",
+                self.name_column,
+                "department",
+                f"{self.score_expression} AS marks"
+            ]
+
+            self.export_headers = [
+                "Roll Number",
+                "Full Name",
+                "Department",
+                "Marks"
+            ]
+
+        else:
+
+            self.export_columns = [
+                self.name_column,
+                "department",
+                f"{self.score_expression} AS marks"
+            ]
+
+            self.export_headers = [
+                "Full Name",
+                "Department",
+                "Marks"
+            ]
+
+    # ---------- MARKS GRAPH ---------- #
+
+    def show_marks_graph(self):
 
         self.clear_graph()
 
         self.cursor.execute(
-            "SELECT full_name, cgpa FROM students"
+            f"""
+            SELECT {self.name_column}, {self.score_expression} AS marks
+            FROM students
+            """
         )
 
         data = self.cursor.fetchall()
@@ -183,7 +221,7 @@ class AnalyticsPage(ctk.CTkFrame):
         ax.bar(names, values)
 
         ax.set_title(
-            "CGPA Distribution",
+            "Marks Distribution",
             fontsize=16,
             color="#394B8A"
         )
@@ -195,35 +233,41 @@ class AnalyticsPage(ctk.CTkFrame):
         )
 
         ax.set_ylabel(
-            "CGPA",
+            "Marks",
             fontsize=10,
             color="#394B8A"
         )
+
+        ax.set_ylim(0, 100)
 
         plt.tight_layout()
 
         self.display_graph(fig)
 
-    # ---------- ATTENDANCE GRAPH ---------- #
+    # ---------- GRADE DISTRIBUTION ---------- #
 
-    def show_attendance_graph(self):
+    def show_grade_distribution(self):
 
         self.clear_graph()
 
         self.cursor.execute(
-            "SELECT full_name, attendance FROM students"
+            f"""
+            SELECT
+            SUM(CASE WHEN {self.score_expression} >= 90 THEN 1 ELSE 0 END) AS A,
+            SUM(CASE WHEN {self.score_expression} BETWEEN 75 AND 89 THEN 1 ELSE 0 END) AS B,
+            SUM(CASE WHEN {self.score_expression} BETWEEN 60 AND 74 THEN 1 ELSE 0 END) AS C,
+            SUM(CASE WHEN {self.score_expression} BETWEEN 40 AND 59 THEN 1 ELSE 0 END) AS D,
+            SUM(CASE WHEN {self.score_expression} < 40 THEN 1 ELSE 0 END) AS F
+            FROM students
+            """
         )
 
-        data = self.cursor.fetchall()
-
-        names = []
-        values = []
-
-        for row in data:
-
-            names.append(row[0])
-
-            values.append(float(row[1]))
+        values = self.cursor.fetchone()
+        grades = ["A", "B", "C", "D", "F"]
+        counts = [
+            value or 0
+            for value in values
+        ]
 
         fig, ax = plt.subplots(
             figsize=(10, 3.5),
@@ -232,10 +276,14 @@ class AnalyticsPage(ctk.CTkFrame):
 
         self.style_graph(fig, ax)
 
-        ax.bar(names, values)
+        ax.barh(
+            grades,
+            counts,
+            color="#3B73D9"
+        )
 
         ax.set_title(
-            "Attendance Distribution",
+            "Grade Distribution",
             fontsize=16,
             color="#394B8A"
         )
@@ -247,7 +295,7 @@ class AnalyticsPage(ctk.CTkFrame):
         )
 
         ax.set_ylabel(
-            "Attendance %",
+            "Grade Bands",
             fontsize=10,
             color="#394B8A"
         )
@@ -256,53 +304,128 @@ class AnalyticsPage(ctk.CTkFrame):
 
         self.display_graph(fig)
 
-    # ---------- DEPARTMENT GRAPH ---------- #
+    # ---------- DEPARTMENT SUMMARY ---------- #
 
-    def show_department_graph(self):
+    def show_department_summary(self):
 
         self.clear_graph()
+
+        self.cursor.execute(
+            f"""
+            SELECT
+            department,
+            ROUND(AVG({self.score_expression}), 2) AS average_marks,
+            MAX({self.score_expression}) AS highest_marks,
+            MIN({self.score_expression}) AS lowest_marks
+            FROM students
+            GROUP BY department
+            ORDER BY department
+            """
+        )
+
+        department_data = self.cursor.fetchall()
 
         self.cursor.execute(
             """
             SELECT department, COUNT(*)
             FROM students
             GROUP BY department
+            ORDER BY department
             """
         )
 
-        data = self.cursor.fetchall()
+        pie_data = self.cursor.fetchall()
 
         departments = []
         counts = []
 
-        for row in data:
+        for row in pie_data:
 
             departments.append(row[0])
 
             counts.append(row[1])
 
         fig, ax = plt.subplots(
-            figsize=(10, 3.5),
+            figsize=(5.2, 3.2),
             dpi=100
         )
 
-        fig.patch.set_facecolor("#DCE6FF")
+        fig.patch.set_facecolor("#E8EEFF")
 
         ax.pie(
             counts,
             labels=departments,
-            autopct='%1.1f%%'
+            autopct="%1.1f%%",
+            startangle=90,
+            colors=[
+                "#2559B8",
+                "#3B73D9",
+                "#5B8FE8",
+                "#86ABF0",
+                "#B4C8F6"
+            ],
+            textprops={
+                "color": "#394B8A",
+                "fontsize": 9
+            }
         )
 
         ax.set_title(
             "Department Distribution",
-            fontsize=16,
+            fontsize=14,
             color="#394B8A"
         )
 
-        plt.tight_layout()
+        canvas = FigureCanvasTkAgg(
+            fig,
+            master=self.analytics_frame
+        )
 
-        self.display_graph(fig)
+        canvas.draw()
+
+        canvas.get_tk_widget().place(
+            x=295,
+            y=28
+        )
+
+        summary = ctk.CTkTextbox(
+            self.analytics_frame,
+            width=310,
+            height=240,
+            fg_color="#DCE6FF",
+            text_color="#394B8A",
+            font=("Consolas", 12),
+            corner_radius=12,
+            border_width=2,
+            border_color="#A8B8E8"
+        )
+
+        summary.place(
+            x=765,
+            y=40
+        )
+
+        header = (
+            f"{'Dept':<10}"
+            f"{'Avg':>8}"
+            f"{'High':>8}"
+            f"{'Low':>8}\n"
+        )
+
+        summary.insert("end", header)
+        summary.insert("end", "-" * 34 + "\n")
+
+        for row in department_data:
+
+            summary.insert(
+                "end",
+                f"{row[0]:<10}"
+                f"{float(row[1]):>8.2f}"
+                f"{float(row[2]):>8.2f}"
+                f"{float(row[3]):>8.2f}\n"
+            )
+
+        summary.configure(state="disabled")
 
     # ---------- MAIN ---------- #
 
@@ -326,31 +449,41 @@ class AnalyticsPage(ctk.CTkFrame):
 
         self.cursor = self.connection.cursor()
 
+        self.configure_student_columns()
+
         # ---------- KPI DATA ---------- #
 
         self.cursor.execute(
-            "SELECT COUNT(*) FROM students"
+            f"""
+            SELECT
+            COUNT(*),
+            ROUND(AVG({self.score_expression}), 2),
+            MAX({self.score_expression}),
+            MIN({self.score_expression})
+            FROM students
+            """
         )
 
-        total_students = self.cursor.fetchone()[0]
+        kpi_data = self.cursor.fetchone()
+
+        total_students = kpi_data[0]
+        avg_marks = kpi_data[1]
+        highest_marks = kpi_data[2]
+        lowest_marks = kpi_data[3]
 
         self.cursor.execute(
-            "SELECT ROUND(AVG(cgpa), 2) FROM students"
+            f"""
+            SELECT
+            SUM(CASE WHEN {self.score_expression} >= 90 THEN 1 ELSE 0 END) AS A,
+            SUM(CASE WHEN {self.score_expression} BETWEEN 75 AND 89 THEN 1 ELSE 0 END) AS B,
+            SUM(CASE WHEN {self.score_expression} BETWEEN 60 AND 74 THEN 1 ELSE 0 END) AS C,
+            SUM(CASE WHEN {self.score_expression} BETWEEN 40 AND 59 THEN 1 ELSE 0 END) AS D,
+            SUM(CASE WHEN {self.score_expression} < 40 THEN 1 ELSE 0 END) AS F
+            FROM students
+            """
         )
 
-        avg_cgpa = self.cursor.fetchone()[0]
-
-        self.cursor.execute(
-            "SELECT MAX(cgpa) FROM students"
-        )
-
-        highest_cgpa = self.cursor.fetchone()[0]
-
-        self.cursor.execute(
-            "SELECT COUNT(*) FROM students WHERE attendance < 75"
-        )
-
-        low_attendance = self.cursor.fetchone()[0]
+        self.grade_distribution = self.cursor.fetchone()
 
         # ---------- BACKGROUND ---------- #
 
@@ -412,20 +545,20 @@ class AnalyticsPage(ctk.CTkFrame):
 
         self.create_card(
             kpi_frame,
-            "Average CGPA",
-            avg_cgpa
+            "Average Marks",
+            avg_marks
         )
 
         self.create_card(
             kpi_frame,
-            "Highest CGPA",
-            highest_cgpa
+            "Highest Marks",
+            highest_marks
         )
 
         self.create_card(
             kpi_frame,
-            "Low Attendance",
-            low_attendance
+            "Lowest Marks",
+            lowest_marks
         )
 
         # ---------- BUTTON FRAME ---------- #
@@ -443,36 +576,36 @@ class AnalyticsPage(ctk.CTkFrame):
 
         # ---------- BUTTONS ---------- #
 
-        cgpa_button = ctk.CTkButton(
+        marks_button = ctk.CTkButton(
             button_frame,
-            text="CGPA",
+            text="Marks",
             font=("Georgia", 14),
             width=160,
             height=36,
             corner_radius=12,
             fg_color="#5B6FB8",
             hover_color="#394B8A",
-            command=self.show_cgpa_graph
+            command=self.show_marks_graph
         )
 
-        cgpa_button.pack(
+        marks_button.pack(
             side="left",
             padx=12
         )
 
-        attendance_button = ctk.CTkButton(
+        grades_button = ctk.CTkButton(
             button_frame,
-            text="Attendance",
+            text="Grades",
             font=("Georgia", 14),
             width=160,
             height=36,
             corner_radius=12,
             fg_color="#5B6FB8",
             hover_color="#394B8A",
-            command=self.show_attendance_graph
+            command=self.show_grade_distribution
         )
 
-        attendance_button.pack(
+        grades_button.pack(
             side="left",
             padx=12
         )
@@ -486,7 +619,7 @@ class AnalyticsPage(ctk.CTkFrame):
             corner_radius=12,
             fg_color="#5B6FB8",
             hover_color="#394B8A",
-            command=self.show_department_graph
+            command=self.show_department_summary
         )
 
         department_button.pack(
@@ -517,10 +650,10 @@ class AnalyticsPage(ctk.CTkFrame):
         # ---------- TOP PERFORMERS ---------- #
 
         self.cursor.execute(
-            """
-            SELECT full_name, cgpa
+            f"""
+            SELECT {self.name_column}, {self.score_expression} AS marks
             FROM students
-            ORDER BY cgpa DESC
+            ORDER BY marks DESC
             LIMIT 3
             """
         )
@@ -532,7 +665,7 @@ class AnalyticsPage(ctk.CTkFrame):
         for student in toppers:
 
             topper_text += (
-                f"{student[0]}  -  CGPA {student[1]}\n"
+                f"{student[0]}  -  Marks {student[1]}\n"
             )
 
         self.topper_card = ctk.CTkFrame(
@@ -587,7 +720,7 @@ class AnalyticsPage(ctk.CTkFrame):
 
         # ---------- DEFAULT GRAPH ---------- #
 
-        self.show_cgpa_graph()
+        self.show_grade_distribution()
 
         # ---------- CLEAN CLOSE ---------- #
 

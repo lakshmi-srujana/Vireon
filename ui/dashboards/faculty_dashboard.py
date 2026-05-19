@@ -143,7 +143,7 @@ class FacultyDashboard(ctk.CTkFrame):
         # ------------------------------------------------ #
 
         self.bg_image = ctk.CTkImage(
-            light_image=Image.open(resource_path("assets/images/vireon_common.png")),
+            light_image=Image.open(resource_path("assets/images/vireon_studentdash.png")),
             size=(1200, 700)
         )
 
@@ -156,46 +156,156 @@ class FacultyDashboard(ctk.CTkFrame):
         bg_label.place(x=0, y=0)
 
         # ------------------------------------------------ #
-        # TITLE
+        # VISUAL THEME
         # ------------------------------------------------ #
 
-        title = ctk.CTkLabel(
+        navy = "#1F3763"
+        slate = "#51617D"
+        muted = "#7A89A6"
+        panel = "#F7FAFF"
+        card = "#FFFFFF"
+        soft_blue = "#E8F0FF"
+        line = "#C9D6F2"
+        accent = "#2F80ED"
+        mid_blue = "#4F8DEB"
+        deep_blue = "#2559B8"
+        warning = "#D65F6B"
+        soft_warning = "#FFF0F2"
+        soft_button = "#6F86B8"
+
+        # ------------------------------------------------ #
+        # MAIN SURFACE
+        # ------------------------------------------------ #
+
+        shell = ctk.CTkFrame(
             self,
-            text="Faculty Dashboard",
-            font=("Georgia", 34, "bold"),
-            text_color="#5B6FB8",
-            fg_color="#EEF3FF",
-            corner_radius=2,
-            width=450,
-            height=60
+            width=1080,
+            height=600,
+            fg_color=panel,
+            corner_radius=18,
+            border_width=1,
+            border_color="#D7E1F3"
         )
 
-        title.place(x=375, y=25)
+        shell.place(x=60, y=80)
+
+        # ------------------------------------------------ #
+        # HEADER
+        # ------------------------------------------------ #
+
+        header = ctk.CTkFrame(
+            shell,
+            width=1020,
+            height=82,
+            fg_color=card,
+            corner_radius=12,
+            border_width=1,
+            border_color="#E1E8F6"
+        )
+
+        header.place(x=30, y=22)
+
+        title = ctk.CTkLabel(
+            header,
+            text="Faculty Dashboard",
+            font=("Georgia", 31, "bold"),
+            text_color=navy
+        )
+
+        title.place(x=28, y=13)
+
+        subtitle = ctk.CTkLabel(
+            header,
+            text=f"{self.full_name}  |  {self.department}  |  {self.designation}",
+            font=("Segoe UI", 14),
+            text_color=slate
+        )
+
+        subtitle.place(x=31, y=54)
+
+        status_badge = ctk.CTkLabel(
+            header,
+            text=self.performance,
+            width=310,
+            height=34,
+            fg_color=soft_blue,
+            corner_radius=17,
+            font=("Segoe UI", 13, "bold"),
+            text_color=accent
+        )
+
+        status_badge.place(x=680, y=24)
+
+        # ------------------------------------------------ #
+        # QUICK STATS
+        # ------------------------------------------------ #
+
+        stat_data = [
+            ("Students", self.total_students, "in department", accent),
+            ("Average CGPA", self.avg_cgpa, "department score", mid_blue),
+            ("Low Attendance", self.low_attendance, "need review", warning),
+            ("Department", self.department, "assigned group", deep_blue)
+        ]
+
+        for index, (label, value, caption, color) in enumerate(stat_data):
+
+            stat_card = ctk.CTkFrame(
+                shell,
+                width=235,
+                height=82,
+                fg_color=card,
+                corner_radius=12,
+                border_width=1,
+                border_color="#E1E8F6"
+            )
+
+            stat_card.place(x=30 + (index * 260), y=120)
+
+            ctk.CTkLabel(
+                stat_card,
+                text=label,
+                font=("Segoe UI", 12, "bold"),
+                text_color=muted
+            ).place(x=18, y=12)
+
+            ctk.CTkLabel(
+                stat_card,
+                text=str(value),
+                font=("Georgia", 24, "bold"),
+                text_color=color
+            ).place(x=18, y=34)
+
+            ctk.CTkLabel(
+                stat_card,
+                text=caption,
+                font=("Segoe UI", 11),
+                text_color=muted
+            ).place(x=122, y=46)
 
         # ------------------------------------------------ #
         # PROFILE CARD
         # ------------------------------------------------ #
 
         profile_card = ctk.CTkFrame(
-            self,
-            width=280,
-            height=430,
-            fg_color="#EEF3FF",
-            corner_radius=5,
-            border_width=3,
-            border_color="#B8C4E8"
+            shell,
+            width=320,
+            height=250,
+            fg_color=card,
+            corner_radius=12,
+            border_width=1,
+            border_color="#E1E8F6"
         )
 
-        profile_card.place(x=80, y=170)
+        profile_card.place(x=30, y=222)
 
         profile_title = ctk.CTkLabel(
             profile_card,
-            text="Faculty Profile",
-            font=("Georgia", 20, "bold"),
-            text_color="#5B6FB8"
+            text="Profile",
+            font=("Georgia", 22, "bold"),
+            text_color=navy
         )
 
-        profile_title.pack(pady=(20, 20))
+        profile_title.place(x=22, y=16)
 
         details = [
 
@@ -210,20 +320,34 @@ class FacultyDashboard(ctk.CTkFrame):
 
         ]
 
-        for detail in details:
+        for index, detail in enumerate(details):
+
+            label_name, label_value = detail.split(" : ", 1)
 
             label = ctk.CTkLabel(
                 profile_card,
-                text=detail,
-                font=("Georgia", 15),
-                text_color="#394B8A",
+                text=label_name.upper(),
+                font=("Segoe UI", 10, "bold"),
+                text_color=muted,
                 anchor="w"
             )
 
-            label.pack(
-                pady=8,
-                padx=20,
+            label.place(
+                x=22,
+                y=54 + index * 24
+            )
+
+            value = ctk.CTkLabel(
+                profile_card,
+                text=label_value,
+                font=("Segoe UI", 13),
+                text_color=navy,
                 anchor="w"
+            )
+
+            value.place(
+                x=128,
+                y=51 + index * 24
             )
 
         # ------------------------------------------------ #
@@ -231,25 +355,34 @@ class FacultyDashboard(ctk.CTkFrame):
         # ------------------------------------------------ #
 
         graph_card = ctk.CTkFrame(
-            self,
-            width=490,
-            height=430,
-            fg_color="#EEF3FF",
-            corner_radius=5,
-            border_width=3,
-            border_color="#B8C4E8"
+            shell,
+            width=405,
+            height=250,
+            fg_color=card,
+            corner_radius=12,
+            border_width=1,
+            border_color="#E1E8F6"
         )
 
-        graph_card.place(x=330, y=120)
+        graph_card.place(x=370, y=222)
 
         graph_title = ctk.CTkLabel(
             graph_card,
             text="Department Analytics",
-            font=("Georgia", 18, "bold"),
-            text_color="#5B6FB8"
+            font=("Georgia", 22, "bold"),
+            text_color=navy
         )
 
-        graph_title.pack(pady=(20, 10))
+        graph_title.place(x=22, y=16)
+
+        graph_caption = ctk.CTkLabel(
+            graph_card,
+            text="CGPA and low-attendance counts are normalized for comparison.",
+            font=("Segoe UI", 11),
+            text_color=muted
+        )
+
+        graph_caption.place(x=24, y=47)
 
         # ------------------------------------------------ #
         # GRAPH
@@ -268,7 +401,7 @@ class FacultyDashboard(ctk.CTkFrame):
         ]
 
         self.fig = plt.Figure(
-            figsize=(2.8, 2.2),
+            figsize=(3.6, 1.75),
             dpi=100
         )
 
@@ -276,16 +409,36 @@ class FacultyDashboard(ctk.CTkFrame):
 
         ax.bar(
             labels,
-            values
+            values,
+            color=[accent, mid_blue, warning],
+            width=0.48,
+            edgecolor="#FFFFFF",
+            linewidth=1.4
         )
 
-        ax.set_title(
-            f"{self.department} Analytics"
+        ax.grid(
+            axis="y",
+            color="#DDE6F7",
+            linewidth=0.8
         )
 
-        self.fig.patch.set_facecolor("#DCE6FF")
+        ax.set_axisbelow(True)
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+        ax.spines["left"].set_color(line)
+        ax.spines["bottom"].set_color(line)
+        ax.tick_params(
+            colors=slate,
+            labelsize=8
+        )
 
-        ax.set_facecolor("#EEF3FF")
+        self.fig.patch.set_facecolor(card)
+
+        ax.set_facecolor(card)
+
+        self.fig.tight_layout(
+            pad=1.1
+        )
 
         canvas = FigureCanvasTkAgg(
             self.fig,
@@ -294,19 +447,25 @@ class FacultyDashboard(ctk.CTkFrame):
 
         canvas.draw()
 
-        canvas.get_tk_widget().pack(
-            pady=5
+        canvas.get_tk_widget().place(
+            x=18,
+            y=70
         )
 
         performance_label = ctk.CTkLabel(
             graph_card,
             text=self.performance,
-            font=("Georgia",12, "bold"),
-            text_color="#5B6FB8"
+            font=("Segoe UI", 13, "bold"),
+            text_color=accent,
+            fg_color=soft_blue,
+            corner_radius=15,
+            width=275,
+            height=30
         )
 
-        performance_label.pack(
-            pady=(5, 10)
+        performance_label.place(
+            x=65,
+            y=210
         )
 
         # ------------------------------------------------ #
@@ -339,44 +498,45 @@ class FacultyDashboard(ctk.CTkFrame):
             )
 
         alert_frame = ctk.CTkFrame(
-            self,
-            width=200,
-            height=140,
-            fg_color="#FFF1F1",
-            corner_radius=4,
-            border_width=2,
-            border_color="#E6A8A8"
+            shell,
+            width=320,
+            height=88,
+            fg_color=soft_warning,
+            corner_radius=12,
+            border_width=1,
+            border_color="#F2BDC5"
         )
 
         alert_frame.place(
-            x=600,
-            y=250
+            x=30,
+            y=488
         )
 
         alert_title = ctk.CTkLabel(
             alert_frame,
             text="Attendance Alerts",
-            font=("Georgia", 18, "bold"),
-            text_color="#C25B5B"
+            font=("Georgia", 17, "bold"),
+            text_color=warning
         )
 
         alert_title.place(
             x=18,
-            y=10
+            y=8
         )
 
         alert_box = ctk.CTkTextbox(
             alert_frame,
-            width=170,
-            height=70,
-            fg_color="#FFE7E7",
-            text_color="#A94442",
-            font=("Georgia", 12)
+            width=280,
+            height=42,
+            fg_color="#FFE3E7",
+            text_color="#9F3441",
+            font=("Segoe UI", 11),
+            corner_radius=8
         )
 
         alert_box.place(
             x=18,
-            y=55
+            y=38
         )
 
         alert_box.insert(
@@ -388,16 +548,16 @@ class FacultyDashboard(ctk.CTkFrame):
         # ------------------------------------------------ #
 
         topper_frame = ctk.CTkFrame(
-            self,
-            width=240,
-            height=230,
-            fg_color="#EEF3FF",
-            corner_radius=4,
-            border_width=2,
-            border_color="#B8C4E8"
+            shell,
+            width=245,
+            height=170,
+            fg_color=card,
+            corner_radius=12,
+            border_width=1,
+            border_color="#E1E8F6"
         )
 
-        topper_frame.place(x=850, y=120)
+        topper_frame.place(x=805, y=222)
 
         self.cursor.execute(
             """
@@ -412,115 +572,132 @@ class FacultyDashboard(ctk.CTkFrame):
 
         toppers = self.cursor.fetchall()
 
-        topper_text = (
-            f"Top {self.department} Students\n\n"
-        )
-
-        for student in toppers:
-
-            topper_text += (
-                f"{student[0]}\nCGPA : {student[1]}\n\n"
-            )
-
-        topper_label = ctk.CTkLabel(
+        ctk.CTkLabel(
             topper_frame,
-            text=topper_text,
-            justify="left",
-            font=("Georgia", 15),
-            text_color="#394B8A"
+            text=f"Top {self.department} Students",
+            font=("Georgia", 18, "bold"),
+            text_color=navy
+        ).place(
+            x=18,
+            y=15
         )
 
-        topper_label.place(
-            x=20,
-            y=20
-        )
+        for index, student in enumerate(toppers, start=1):
+
+            row_y = 48 + ((index - 1) * 36)
+
+            ctk.CTkLabel(
+                topper_frame,
+                text=f"{index}. {student[0]}",
+                font=("Segoe UI", 13, "bold"),
+                text_color=navy,
+                anchor="w",
+                width=190
+            ).place(x=20, y=row_y)
+
+            ctk.CTkLabel(
+                topper_frame,
+                text=f"CGPA {student[1]}",
+                font=("Segoe UI", 12),
+                text_color=slate,
+                anchor="w",
+                width=190
+            ).place(x=35, y=row_y + 18)
 
         # ------------------------------------------------ #
         # BONUS FRAME
         # ------------------------------------------------ #
 
         bonus_frame = ctk.CTkFrame(
-            self,
-            width=240,
-            height=170,
-            fg_color="#EEF3FF",
-            corner_radius=4,
-            border_width=2,
-            border_color="#B8C4E8"
+            shell,
+            width=245,
+            height=140,
+            fg_color=card,
+            corner_radius=12,
+            border_width=1,
+            border_color="#E1E8F6"
         )
 
-        bonus_frame.place(x=850, y=370)
+        bonus_frame.place(x=805, y=408)
 
         self.roll_entry = ctk.CTkEntry(
             bonus_frame,
-            width=180,
+            width=205,
             placeholder_text="Roll No",
-            font=("Georgia", 12),
+            font=("Segoe UI", 12),
+            border_color=line,
         )
 
         self.roll_entry.place(
-            x=30,
-            y=20
+            x=20,
+            y=14
         )
 
         self.bonus_entry = ctk.CTkEntry(
             bonus_frame,
-            width=180,
+            width=205,
             placeholder_text="Bonus CGPA",
-            font=("Georgia", 12),
+            font=("Segoe UI", 12),
+            border_color=line,
         )
 
         self.bonus_entry.place(
-            x=30,
-            y=60
+            x=20,
+            y=46
         )
 
         bonus_button = ctk.CTkButton(
             bonus_frame,
             text="Add Bonus",
-            width=180,
-            font=("Georgia", 12),
-            fg_color="#8792AE",
+            width=205,
+            height=26,
+            corner_radius=8,
+            font=("Segoe UI", 12, "bold"),
+            fg_color=soft_button,
+            hover_color="#5F76A8",
             command=self.add_bonus_marks
         )
 
         bonus_button.place(
-            x=30,
-            y=100
+            x=20,
+            y=78
         )
 
         csv_button = ctk.CTkButton(
             bonus_frame,
             text="Export CSV",
-            width=180,
-            font=("Georgia", 12),
-            fg_color="#5B6FB8",
+            width=205,
+            height=26,
+            corner_radius=8,
+            font=("Segoe UI", 12, "bold"),
+            fg_color=accent,
+            hover_color="#226BC7",
             command=self.export_toppers_csv
         )
 
         csv_button.place(
-            x=30,
-            y=135
+            x=20,
+            y=108
         )
         # ------------------------------------------------ #   
         # ADD/EDIT STUDENTS BUTTON     
         # ------------------------------------------------ #        
 
         addstudent_button = ctk.CTkButton(
-            self,
+            shell,
             text="Add/Edit Students",
             width=220,
-            height=40,
-            corner_radius=3,
-            fg_color="#8792AE",
-            hover_color="#7380A3",
-            font=("Georgia", 16),
+            height=38,
+            corner_radius=10,
+            fg_color=soft_button,
+            hover_color="#5F76A8",
+            font=("Segoe UI", 14, "bold"),
             command=self.open_students
         )
 
         addstudent_button.place(
-            x=440,
-            y=600
+            x=370,
+            y=550
         )
 
         # ------------------------------------------------ #
@@ -528,25 +705,25 @@ class FacultyDashboard(ctk.CTkFrame):
         # ------------------------------------------------ #
 
         student_frame = ctk.CTkFrame(
-            self,
-            width=400,
-            height=120,
-            fg_color="#EEF3FF",
-            corner_radius=3,
-            border_width=2,
-            border_color="#B8C4E8"
+            shell,
+            width=405,
+            height=66,
+            fg_color=card,
+            corner_radius=12,
+            border_width=1,
+            border_color="#E1E8F6"
         )
 
         student_frame.place(
-            x=365,
-            y=460
+            x=370,
+            y=476
         )
 
         student_title = ctk.CTkLabel(
             student_frame,
             text=f"{self.department} Students",
-            font=("Georgia", 18, "bold"),
-            text_color="#5B6FB8"
+            font=("Georgia", 17, "bold"),
+            text_color=navy
         )
 
         student_title.place(
@@ -556,16 +733,17 @@ class FacultyDashboard(ctk.CTkFrame):
 
         self.student_box = ctk.CTkTextbox(
             student_frame,
-            width=350,
-            height=70,
+            width=365,
+            height=30,
             font=("Consolas", 11),
-            text_color="#394B8A",
-            fg_color="#DCE6FF"
+            text_color=navy,
+            fg_color=soft_blue,
+            corner_radius=8
         )
 
         self.student_box.place(
             x=20,
-            y=40
+            y=31
         )
 
         self.refresh_students()
@@ -575,37 +753,37 @@ class FacultyDashboard(ctk.CTkFrame):
         # ------------------------------------------------ #
 
         export_button = ctk.CTkButton(
-            self,
+            shell,
             text="Download Report",
             width=220,
-            height=40,
-            corner_radius=3,
-            fg_color="#8792AE",
-            hover_color="#7380A3",
-            font=("Georgia", 16),
+            height=38,
+            corner_radius=10,
+            fg_color=accent,
+            hover_color="#226BC7",
+            font=("Segoe UI", 14, "bold"),
             command=self.export_report
         )
 
         export_button.place(
-            x=670,
-            y=600
+            x=605,
+            y=550
         )
 
         logout_button = ctk.CTkButton(
-            self,
+            shell,
             text="Logout",
             width=150,
-            height=40,
-            corner_radius=3,
-            fg_color="#C27A86",
-            hover_color="#AA6570",
-            font=("Georgia", 16),
+            height=38,
+            corner_radius=10,
+            fg_color="#748ABE",
+            hover_color="#6178AC",
+            font=("Segoe UI", 14, "bold"),
             command=self.logout
         )
 
         logout_button.place(
-            x=900,
-            y=600
+            x=840,
+            y=550
         )
 
     # ------------------------------------------------ #
